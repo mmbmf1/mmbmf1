@@ -4,7 +4,7 @@
 
 - 🔭 I’m currently working on [projects at Conexon](https://conexon.us/)
 
-- 💬 Ask me about **Data, JS, React, NextJS, PostgreSQL**
+- 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, data**
 
 <!--
 **mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
