@@ -2,9 +2,6 @@
 
 ## Hi there 👋
 
-### 🏗️
-
-
 <!--
 **mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
@@ -19,3 +16,11 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+
+ <h3 align="left">Connect with me:</h3>
+ <p align="left">
+  
+ <a href="https://linkedin.com/in/michael-mace-kc" target="blank"><img align="center" src="./assets/linkedin.svg" alt="mmbmf1" height="30" width="30" /></a>
+ <a href="https://x.com/ikilledtoast" target="blank"><img align="center" src="./assets/twitter.svg" alt="mmbmf1" height="30" width="30" /></a>
+ 
+ </p>
