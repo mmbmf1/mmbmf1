@@ -1,8 +1,9 @@
+<img src='./readme_cover.jpg'/>
+
 ## Hi there 👋
 
 ### 🏗️
 
-![Banner](/https://github.com/mmbmf1/mmbmf1/blob/main/readme_cover.jpg)
 
 <!--
 **mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
