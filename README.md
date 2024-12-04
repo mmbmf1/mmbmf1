@@ -1,6 +1,6 @@
 <img src='./readme_cover.jpg'/>
 
-## Hi there 👋
+## hey, whats up? 👋
 
 - 🔭 I’m currently working on [projects at Conexon](https://conexon.us/)
 
