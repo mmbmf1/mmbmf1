@@ -25,8 +25,8 @@
 - Part of the the team that led development of PAID system with full user adoption across project coordinators
 - Architected successful cross-application integration for streamlined workflows
 - Part of team that built central API platform serving as unified data source for all applications
-- Mentored junior developers while maintaining high code quality standards
-- Automated critical business processes for Funding, Regulatory, and Project teams
+- Helping mentor junior developers while maintaining high code quality standards
+- Automated business processes for Funding, Regulatory, and Billing team
 
 <!--
 **mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
