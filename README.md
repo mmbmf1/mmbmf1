@@ -1,4 +1,18 @@
-<img src='./assets/readme_cover.jpg' style="height: 45vh; width: 100%; object-fit: cover; object-position: center 70%;"/>
+<div align="center">
+  <img 
+    src='./assets/readme_cover.jpg' 
+    alt="Michael Mace - Software Developer"
+    style="
+      width: 100%;
+      max-width: 800px;
+      height: 250px;
+      object-fit: cover;
+      object-position: center 70%;
+      border-radius: 8px;
+      margin: 0 auto;
+    "
+  />
+</div>
 
 ## hey, whats up? 👋
 
