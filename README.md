@@ -1,4 +1,4 @@
-<img src='./readme_cover.jpg'/>
+<img src='./assets/readme_cover.jpg' style="height: 60vh; width: 100%; object-fit: cover; object-position: center 60%;"/>
 
 ## hey, whats up? 👋
 
