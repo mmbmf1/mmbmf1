@@ -2,7 +2,7 @@
 
 ## hey, whats up? 👋
 
-- 🔭 I'm currently working as **Lead Developer** at [Conexon](https://conexon.us/) building enterprise applications
+- 🔭 I'm currently working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
 - 🏗️ **Architecting and building** large-scale production systems with JavaScript/Node.js
 - 🤝 **Mentoring junior developers** and leading technical teams through complex system integrations
 - 🚀 **Developing** core business systems including PAID, central API, and cross-application integrations
