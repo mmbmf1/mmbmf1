@@ -22,9 +22,9 @@
 
 **Recent Achievements:**
 
-- Led development of PAID system with full user adoption across project coordinators
-- Architected first successful cross-application integration for streamlined workflows
-- Built central API platform serving as unified data source for all applications
+- Part of the the team that led development of PAID system with full user adoption across project coordinators
+- Architected successful cross-application integration for streamlined workflows
+- Part of team that built central API platform serving as unified data source for all applications
 - Mentored junior developers while maintaining high code quality standards
 - Automated critical business processes for Funding, Regulatory, and Project teams
 
