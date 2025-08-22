@@ -32,7 +32,7 @@
 - **Technical Leadership**: Mentoring developers and leading projects from requirements to deployment
 - **Cross-Application Integration**: Building unified data platforms and real-time synchronization
 - **Process Automation**: Streamlining business operations across multiple departments
-- **Full-Stack Development**: JavaScript/Node.js applications serving enterprise users
+- **Full-Stack Development**: applications serving enterprise users
 
 **Recent Achievements:**
 
@@ -40,7 +40,7 @@
 - Architected successful cross-application integration for streamlined workflows
 - Part of team that built central API platform serving as unified data source for all applications
 - Helping mentor junior developers while maintaining high code quality standards
-- Automated business processes for Funding, Regulatory, and Billing team
+- Automated business processes for Funding, Regulatory, and Billing teams
 
 <!--
 **mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
@@ -57,7 +57,7 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 -->
 
-<!-->think it would be good to move these to assests -->
+<!-- think it would be good to move these to assests -->
 <h3 align="left">Languages and Tools:</h3>
 <p align="left">
   <a href="https://www.postgresql.org" target="_blank" rel="noreferrer">
