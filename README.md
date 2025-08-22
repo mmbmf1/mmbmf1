@@ -85,7 +85,8 @@
 </p>
 <br />
 <p align="left">
-  <a href="https://paypal.me/MichaelMace" target="blank">
-    ☕ Buy me a coffee
+  <span style="font-size: 20px;">☕</span>
+  <a href="https://paypal.me/MichaelMace" target="blank" style="font-size: 18px;">
+     Buy me a coffee
   </a>
 </p>
