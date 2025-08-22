@@ -1,3 +1,7 @@
+<!--
+**mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+-->
+
 <div align="center">
   <img 
     src='./assets/readme_cover.jpg' 
@@ -42,20 +46,9 @@
 - Helping mentor junior developers while maintaining high code quality standards
 - Automated business processes for Funding, Regulatory, and Billing teams
 
-<!--
-**mmbmf1/mmbmf1** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## Technical Posts
 
-Here are some ideas to get you started:
-
-- 🔭 I'm currently working on ...
-- 🌱 I'm currently learning ...
-- 👯 I'm looking to collaborate on ...
-- 🤔 I'm looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+- [Building a PostgreSQL FDW Data Pipeline](./posts/postgresql-fdw-pipeline.md) - How to create data synchronization systems using PostgreSQL Foreign Data Wrappers for real-time cross-database access
 
 <!-- think it would be good to move these to assests -->
 <h3 align="left">Languages and Tools:</h3>
