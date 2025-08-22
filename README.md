@@ -22,8 +22,8 @@
 
 - 🔭 I'm currently working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
 - 🏗️ **Architecting and building** large production systems with PostgreSQL and Next.js
-- 🤝 **Mentoring junior developers** and leading technical teams through complex system integrations
-- 🚀 **Developing** core business systems including PAID, central API, and cross-application integrations
+- 🤝 **Mentoring junior developers** and helping to lead technical teams through complex system integrations
+- 🚀 **Developing** core business systems including PAID, central API, a FTTH signup-tool and cross-application integrations
 - 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
 
 ## 🚀 Professional Work
@@ -33,17 +33,14 @@
 **What I work on:**
 
 - **System Architecture**: Designing and implementing scalable APIs and database systems
-- **Technical Leadership**: Mentoring developers and leading projects from requirements to deployment
+- **Technical Leadership**: Helping to mentor junior developers and helping to lead projects from requirements to deployment
 - **Cross-Application Integration**: Building unified data platforms and real-time synchronization
 - **Process Automation**: Streamlining business operations across multiple departments
-- **Full-Stack Development**: applications serving enterprise users
 
 **Recent Achievements:**
 
-- Part of the the team that led development of PAID system with full user adoption across project coordinators
 - Architected successful cross-application integration for streamlined workflows
-- Part of team that built central API platform serving as unified data source for all applications
-- Helping mentor junior developers while maintaining high code quality standards
+- Part of a team that automated invoice creation for interal billing software
 - Automated business processes for Funding, Regulatory, and Billing teams
 
 ## Technical Posts
