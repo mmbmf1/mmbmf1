@@ -47,7 +47,7 @@
 
 - [Building a PostgreSQL FDW Data Pipeline](./posts/postgresql-fdw-pipeline.md) - How to create data synchronization systems using PostgreSQL Foreign Data Wrappers for real-time cross-database access
 
-<h3 align="left">Languages and Tools:</h3>
+<h3 align="left">proud to work with these tools:</h3>
 <p align="left">
   <a href="https://www.postgresql.org" target="_blank" rel="noreferrer">
     <img src="./assets/postgresql-svgrepo-com.svg" alt="postgresql" width="40" height="40"/>
