@@ -18,7 +18,7 @@
   />
 </div>
 
-## hey, whats up? 👋
+## 🖖 hey, whats up?
 
 - 🔭 I'm currently working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
 - 🏗️ **Architecting and building** large production systems with PostgreSQL and Next.js
@@ -26,7 +26,7 @@
 - 🚀 **Developing** core business systems including PAID, central API, a FTTH signup-tool and cross-application integrations
 - 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
 
-## 🚀 Professional Work
+## 🏗 Professional Work
 
 **Lead Full-Stack Developer** specializing in system architecture, PostgreSQL, APIs, and enterprise applications.
 
