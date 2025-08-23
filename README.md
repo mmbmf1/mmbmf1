@@ -43,7 +43,7 @@
 - Part of a team that automated invoice creation for interal billing software
 - Automated business processes for Funding, Regulatory, and Billing teams
 
-## 👨‍💻 Posts
+## 👨‍💻
 
 - [Building a PostgreSQL FDW Data Pipeline](./posts/postgresql-fdw-pipeline.md) - How to create data synchronization systems using PostgreSQL Foreign Data Wrappers for real-time cross-database access
 
