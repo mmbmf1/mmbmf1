@@ -26,7 +26,7 @@
 - 🚀 **Developing** core business systems including PAID, central API, a FTTH signup-tool and cross-application integrations
 - 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
 
-## 🏗 Professional Work
+## 🏗
 
 **Lead Full-Stack Developer** specializing in system architecture, PostgreSQL, APIs, and enterprise applications.
 
