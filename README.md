@@ -30,7 +30,7 @@
 
 **Lead Full-Stack Developer** specializing in system architecture, PostgreSQL, APIs, and enterprise applications.
 
-**What I work on:**
+**Interested in:**
 
 - **System Architecture**: Designing and implementing scalable APIs and database systems
 - **Technical Leadership**: Helping to mentor junior developers and helping to lead projects from requirements to deployment
