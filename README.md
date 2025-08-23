@@ -18,7 +18,7 @@
   />
 </div>
 
-## 🖖 hey, whats up?
+## 🖖 hey, whats up
 
 - 🔭 I'm currently working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
 - 🏗️ **Architecting and building** large production systems with PostgreSQL and Next.js
