@@ -85,6 +85,6 @@
 <h3 align="left">
   ☕
   <a href="https://paypal.me/MichaelMace" target="blank" style="font-size: 18px;">
-     Buy me a coffee
+     buy me a coffee
   </a>
 </h3>
