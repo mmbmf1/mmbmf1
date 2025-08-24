@@ -46,6 +46,7 @@
 ## 👨‍💻
 
 - [Building a PostgreSQL FDW Data Pipeline](./posts/postgresql-fdw-pipeline.md) - How to create data synchronization systems using PostgreSQL Foreign Data Wrappers for real-time cross-database access
+- [Building a PostgreSQL + NextJS geojson pipeline](./posts/postgresql-nextjs-geojson-pipeline.md) - How to build geospatial data pipelines using PostgreSQL and NextJS for mapping applications
 
 <h3 align="left">proud to work with these tools:</h3>
 <p align="left">
