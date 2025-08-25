@@ -40,7 +40,7 @@
 **Recent Achievements:**
 
 - Architected successful cross-application integration for streamlined workflows
-- Part of a team that automated invoice creation for interal billing software
+- Part of a team that automated invoice creation for internal billing software
 - Automated business processes for Funding, Regulatory, and Billing teams
 
 ## 👨‍💻
