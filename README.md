@@ -81,10 +81,3 @@
     <img align="center" src="./assets/twitter.svg" alt="mmbmf1" height="30" width="30" />
   </a>
 </p>
-<br />
-<h3 align="left">
-  ☕
-  <a href="https://paypal.me/MichaelMace" target="blank" style="font-size: 18px;">
-     buy me a coffee
-  </a>
-</h3>
