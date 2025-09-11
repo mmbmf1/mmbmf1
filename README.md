@@ -41,7 +41,7 @@
 **Recent Achievements:**
 
 - Architected successful cross-application integration for streamlined workflows
-- Part of a team that automated invoice creation for interal billing software
+- Part of a team that automated invoice creation for internal billing software
 - Automated business processes for Funding, Regulatory, and Billing teams
 -->
 
@@ -83,10 +83,3 @@
     <img align="center" src="./assets/twitter.svg" alt="mmbmf1" height="30" width="30" />
   </a>
 </p>
-<br />
-<h3 align="left">
-  ☕
-  <a href="https://paypal.me/MichaelMace" target="blank" style="font-size: 18px;">
-     buy me a coffee
-  </a>
-</h3>
