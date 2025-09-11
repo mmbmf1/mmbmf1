@@ -37,11 +37,13 @@
 - **Cross-Application Integration**: Building unified data platforms and real-time synchronization
 - **Process Automation**: Streamlining business operations across multiple departments
 
+<!-- like this but want to update it
 **Recent Achievements:**
 
 - Architected successful cross-application integration for streamlined workflows
 - Part of a team that automated invoice creation for interal billing software
 - Automated business processes for Funding, Regulatory, and Billing teams
+-->
 
 ## 👨‍💻
 
