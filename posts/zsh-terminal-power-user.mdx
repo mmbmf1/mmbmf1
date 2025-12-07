@@ -1,0 +1,54 @@
+---
+title: "Becoming a Terminal Power User: My Journey with Zsh"
+description: "Building a productive terminal setup, one tool at a time"
+date: "2025-01-16"
+tags: ["zsh", "terminal", "productivity", "development"]
+---
+
+# Becoming a Terminal Power User: My Journey with Zsh
+
+**My philosophy:** The more I can do with the keyboard and never leave my terminal/IDE, the more productive I become. Every context switch costs time and mental energy.
+
+## Current Setup
+
+**Plugins:**
+- `git`, `nvm`, `docker` - Standard shortcuts
+- `z` - Smart directory jumping
+- `zsh-autosuggestions` - Command suggestions as you type
+- `zsh-syntax-highlighting` - Visual command validation
+
+Custom prompt shows time, git branch, and status.
+
+## z: Smart Directory Navigation
+
+Typing `cd ~/projects/api/src/components/admin/dashboard` gets old fast.
+
+`z` learns your directory habits. It tracks every `cd` and ranks directories using a "frecency" algorithm (frequency + recency). After a day or two, jump to any frequently-used directory with a few keystrokes.
+
+### Usage
+
+```bash
+z projects   # Jump to most frecent directory
+z api        # Partial matches work
+z -l projects # List matches before jumping
+z -r projects # Jump by rank (most visited)
+z -t projects # Jump by time (most recent)
+z -c api     # Only search subdirectories
+```
+
+### Tips
+
+- Give it a day or two to build data
+- Be specific: `z projects api` when multiple matches exist
+- Combine: `z api && npm start`
+
+**Not working?** Run `source ~/.zshrc`. **No matches?** Normal—database builds automatically after a few days.
+
+---
+
+## Coming Soon
+
+- Autosuggestions and syntax highlighting deep dive
+- Custom aliases and functions
+- Git workflows
+- Docker productivity tips
