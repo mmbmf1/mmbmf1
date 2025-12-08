@@ -1,13 +1,10 @@
----
-title: "Becoming a Terminal Power User: My Journey with Zsh"
-description: "Building a productive terminal setup, one tool at a time"
-date: "2025-01-16"
-tags: ["zsh", "terminal", "productivity", "development"]
----
-
 # Becoming a Terminal Power User: My Journey with Zsh
 
-**My philosophy:** The more I can do with the keyboard and never leave my terminal/IDE, the more productive I become. Every context switch costs time and mental energy.
+**My philosophy:** The keyboard is powerful and keeps me in the flow. Every time I reach for the mouse or click through a GUI menu, I'm breaking that flow. Moving your hand from keyboard to mouse? Context switch. Clicking through menus? Context switch. Even the tiny pause to visually locate a button adds up.
+
+With AI assistants and modern command-line tools, you can do so much with just a few keystrokes. Need to search files? `grep` or `rg`. Transform data? Pipe it through commands. Need help? Ask your AI assistant right there in the terminal. We don't need a GUI for everything!
+
+I'm not saying GUIs are evil—I just find myself reaching for the terminal more often than not. Once you get comfortable with a few commands, it's hard to go back to clicking around.
 
 ## Current Setup
 
@@ -19,6 +16,16 @@ tags: ["zsh", "terminal", "productivity", "development"]
 
 Custom prompt shows time, git branch, and status.
 
+## Setting Up Your .zshrc File
+
+If you're new to terminal customization, the `.zshrc` file is your configuration file. It runs every time you open a new terminal window. This is where you load plugins, create shortcuts, and customize your prompt.
+
+The file lives in your home directory (`~/.zshrc`), and you can edit it with any text editor. After making changes, you can either restart your terminal or run `source ~/.zshrc` to reload the configuration.
+
+Most of the plugins I use are managed through package managers like Homebrew or Oh My Zsh, which makes installation straightforward. Once installed, you simply add a line to your `.zshrc` file to enable each plugin. The setup process is usually well-documented by each tool's maintainers, so even if you're not comfortable editing configuration files, you can follow step-by-step guides.
+
+The key is to start simple—add one tool at a time, test it out, and see if it actually helps. There's no need to configure everything at once. I've been tweaking mine for years, and I'm still finding little improvements.
+
 ## z: Smart Directory Navigation
 
 Typing `cd ~/projects/api/src/components/admin/dashboard` gets old fast.
@@ -28,7 +35,7 @@ Typing `cd ~/projects/api/src/components/admin/dashboard` gets old fast.
 ### Usage
 
 ```bash
-z projects   # Jump to most frecent directory
+z projects   # Jump to most recent directory
 z api        # Partial matches work
 z -l projects # List matches before jumping
 z -r projects # Jump by rank (most visited)
@@ -43,12 +50,3 @@ z -c api     # Only search subdirectories
 - Combine: `z api && npm start`
 
 **Not working?** Run `source ~/.zshrc`. **No matches?** Normal—database builds automatically after a few days.
-
----
-
-## Coming Soon
-
-- Autosuggestions and syntax highlighting deep dive
-- Custom aliases and functions
-- Git workflows
-- Docker productivity tips
