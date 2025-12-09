@@ -1,10 +1,10 @@
-# Becoming a Terminal Power User: My Journey with Zsh
+# Staying on the Keyboard: Terminal Setup for Flow
 
-**My philosophy:** The keyboard is powerful and keeps me in the flow. Every time I reach for the mouse or click through a GUI menu, I'm breaking that flow. Moving your hand from keyboard to mouse? Context switch. Clicking through menus? Context switch. Even the tiny pause to visually locate a button adds up.
+**a philosophy:** The keyboard is powerful and helps when trying to stay in the flow. Every time there is a reach for the mouse or click through a GUI menu, that breaks the flow. Moving the hand from keyboard to mouse? Context switch. Clicking through menus? Context switch. Even the tiny pause to visually locate a button adds up over the course of a day.
 
-With AI assistants and modern command-line tools, you can do so much with just a few keystrokes. Need to search files? `grep` or `rg`. Transform data? Pipe it through commands. Need help? Ask your AI assistant right there in the terminal. We don't need a GUI for everything!
+With AI assistants and modern command-line tools, there's a lot that can be accomplished with just a few keystrokes. Need to search files? `grep` or `rg`. Transform data? Pipe it through commands. Need help? Have your AI assistant run commands right there in the terminal—the same commands you could run yourself. A GUI isn't always necessary.
 
-I'm not saying GUIs are evil—I just find myself reaching for the terminal more often than not. Once you get comfortable with a few commands, it's hard to go back to clicking around.
+GUIs aren't evil—it's just that reaching for the terminal tends to happen more often than not. Once there's comfort with a few commands, it can be hard to go back to clicking around.
 
 ## Current Setup
 
@@ -20,17 +20,17 @@ Custom prompt shows time, git branch, and status.
 
 If you're new to terminal customization, the `.zshrc` file is your configuration file. It runs every time you open a new terminal window. This is where you load plugins, create shortcuts, and customize your prompt.
 
-The file lives in your home directory (`~/.zshrc`), and you can edit it with any text editor. After making changes, you can either restart your terminal or run `source ~/.zshrc` to reload the configuration.
+The file lives in your home directory (`~/.zshrc`), and you can edit it with any text editor. After making changes, you can either restart your terminal or run `source ~/.zshrc` to reload the configuration immediately.
 
-Most of the plugins I use are managed through package managers like Homebrew or Oh My Zsh, which makes installation straightforward. Once installed, you simply add a line to your `.zshrc` file to enable each plugin. The setup process is usually well-documented by each tool's maintainers, so even if you're not comfortable editing configuration files, you can follow step-by-step guides.
+Most plugins are managed through package managers like Homebrew or Oh My Zsh, which makes installation straightforward. Once installed, a line gets added to your `.zshrc` file to enable each plugin. The setup process is usually well-documented by each tool's maintainers, so even if there's discomfort editing configuration files, step-by-step guides are available.
 
-The key is to start simple—add one tool at a time, test it out, and see if it actually helps. There's no need to configure everything at once. I've been tweaking mine for years, and I'm still finding little improvements.
+The approach is to start simple—add one tool at a time, test it out, and see if it actually helps. There's no need to configure everything at once. Tweaking happens over time, and small improvements keep showing up.
 
 ## z: Smart Directory Navigation
 
 Typing `cd ~/projects/api/src/components/admin/dashboard` gets old fast.
 
-`z` learns your directory habits. It tracks every `cd` and ranks directories using a "frecency" algorithm (frequency + recency). After a day or two, jump to any frequently-used directory with a few keystrokes.
+`z` learns directory habits. It tracks every `cd` command and ranks directories using a "frecency" algorithm (frequency + recency). After a day or two of normal use, jumping to any frequently-used directory can happen with just a few keystrokes.
 
 ### Usage
 
@@ -49,4 +49,53 @@ z -c api     # Only search subdirectories
 - Be specific: `z projects api` when multiple matches exist
 - Combine: `z api && npm start`
 
-**Not working?** Run `source ~/.zshrc`. **No matches?** Normal—database builds automatically after a few days.
+**Not working?** Run `source ~/.zshrc` to reload your configuration. **No matches?** That's normal—the database builds automatically as you use your terminal over a few days.
+
+## Git Aliases: Your .gitconfig File
+
+Just like `.zshrc` configures the shell, `.gitconfig` configures Git. This is where aliases get set up—shortcuts for common Git commands that get used all the time.
+
+Instead of typing `git status` every time, an alias like `git s` can be created. Instead of `git checkout -b`, maybe `git cob` (checkout branch). The idea is the same: fewer keystrokes, less context switching, more flow.
+
+Your `.gitconfig` lives in your home directory (`~/.gitconfig`), and you can edit it directly or use `git config --global` commands. For example:
+
+```bash
+git config --global alias.s status
+git config --global alias.co checkout
+git config --global alias.cob 'checkout -b'
+```
+
+Now `git s` shows status, `git co main` checks out main, and `git cob feature-branch` creates and switches to a new branch. These are small changes, but they add up when committing code throughout the day.
+
+The git plugin in a zsh setup adds even more shortcuts—things like `gst` for `git status`, `gco` for `git checkout`, and so on. Between the plugin shortcuts and custom aliases, full Git commands rarely need to be typed out.
+
+## Autosuggestions and Syntax Highlighting
+
+These two plugins are subtle but make a huge difference in day-to-day use.
+
+**zsh-autosuggestions** shows grayed-out suggestions as you type, based on command history. Start typing something that's been typed before, and it'll suggest the rest. Press the right arrow to accept it. It's like having autocomplete for the entire terminal history.
+
+**zsh-syntax-highlighting** colors commands as you type—valid commands turn green, invalid ones turn red. It's instant feedback before hitting enter. No more waiting for "command not found" errors.
+
+Both are "set it and forget it" tools. Install them once, add them to your `.zshrc`, and they just work. The difference is noticeable immediately, especially when typing a lot of commands.
+
+## How It All Works Together
+
+Here's the thing—these tools aren't just individual tricks. They work together to keep things on the keyboard and in flow. Here's what that looks like with a real example.
+
+Say there's a need to switch to a project, check what branch it's on, see what files changed, and commit them. Here's how it might go:
+
+```bash
+z api                    # Jump to project (no typing long paths)
+gst                      # Git status (plugin shortcut, not 'git status')
+# See what changed, make edits in my editor...
+gco -b new-feature       # Create branch (shortcut, not 'git checkout -b')
+ga .                     # Stage everything (shortcut, not 'git add .')
+gc "Add feature"         # Commit (shortcut, not 'git commit -m')
+```
+
+All of that happens without leaving the keyboard. No Finder windows to navigate, no Git GUI to open, no mouse clicks. The prompt already shows the branch name, so there's awareness of location at a glance. Autosuggestions remind of commands that have been used before. Syntax highlighting catches typos before hitting enter.
+
+Compare that to the alternative: opening Finder, navigating folders, opening a Git GUI app, clicking through menus, typing in dialog boxes, switching back to terminal, switching back to editor... Every one of those steps is a context switch. The brain has to shift from "coding" to "navigating" to "clicking" and back.
+
+The config files (`.zshrc`, `.gitconfig`) are where this gets set up once. The commands and shortcuts are what get used every day. Together, they can help keep hands on the keyboard and mind in the code.
