@@ -30,72 +30,30 @@ The approach is to start simple—add one tool at a time, test it out, and see i
 
 Typing `cd ~/projects/api/src/components/admin/dashboard` gets old fast.
 
-`z` learns directory habits. It tracks every `cd` command and ranks directories using a "frecency" algorithm (frequency + recency). After a day or two of normal use, jumping to any frequently-used directory can happen with just a few keystrokes.
+`z` learns directory habits. It tracks every `cd` command and ranks directories using a "frequency" algorithm (frequency + recency). After a day or two of normal use, jumping to any frequently-used directory can happen with just a few keystrokes: `z api` or `z projects`. It learns where you go and gets smarter over time.
 
-### Usage
-
-```bash
-z projects   # Jump to most recent directory
-z api        # Partial matches work
-z -l projects # List matches before jumping
-z -r projects # Jump by rank (most visited)
-z -t projects # Jump by time (most recent)
-z -c api     # Only search subdirectories
-```
-
-### Tips
-
-- Give it a day or two to build data
-- Be specific: `z projects api` when multiple matches exist
-- Combine: `z api && npm start`
-
-**Not working?** Run `source ~/.zshrc` to reload your configuration. **No matches?** That's normal—the database builds automatically as you use your terminal over a few days.
-
-## Git Aliases: Your .gitconfig File
-
-Just like `.zshrc` configures the shell, `.gitconfig` configures Git. This is where aliases get set up—shortcuts for common Git commands that get used all the time.
-
-Instead of typing `git status` every time, an alias like `git s` can be created. Instead of `git checkout -b`, maybe `git cob` (checkout branch). The idea is the same: fewer keystrokes, less context switching, more flow.
-
-Your `.gitconfig` lives in your home directory (`~/.gitconfig`), and you can edit it directly or use `git config --global` commands. For example:
-
-```bash
-git config --global alias.s status
-git config --global alias.co checkout
-git config --global alias.cob 'checkout -b'
-```
-
-Now `git s` shows status, `git co main` checks out main, and `git cob feature-branch` creates and switches to a new branch. These are small changes, but they add up when committing code throughout the day.
-
-The git plugin in a zsh setup adds even more shortcuts—things like `gst` for `git status`, `gco` for `git checkout`, and so on. Between the plugin shortcuts and custom aliases, full Git commands rarely need to be typed out.
+The git plugin is another example of efficiency gains. `git checkout -b new-feature` becomes `gco -b new-feature`. `git status` becomes `gst`. Small shortcuts that add up when used throughout the day.
 
 ## Autosuggestions and Syntax Highlighting
 
-These two plugins are subtle but make a huge difference in day-to-day use.
+These two plugins are subtle but make a huge difference. **zsh-autosuggestions** shows grayed-out suggestions as you type, based on command history. Press the right arrow to accept. **zsh-syntax-highlighting** colors commands as you type—valid commands turn green, invalid ones turn red. Instant feedback before hitting enter.
 
-**zsh-autosuggestions** shows grayed-out suggestions as you type, based on command history. Start typing something that's been typed before, and it'll suggest the rest. Press the right arrow to accept it. It's like having autocomplete for the entire terminal history.
-
-**zsh-syntax-highlighting** colors commands as you type—valid commands turn green, invalid ones turn red. It's instant feedback before hitting enter. No more waiting for "command not found" errors.
-
-Both are "set it and forget it" tools. Install them once, add them to your `.zshrc`, and they just work. The difference is noticeable immediately, especially when typing a lot of commands.
+Both are "set it and forget it" tools. Install them once, add them to your `.zshrc`, and they just work.
 
 ## How It All Works Together
 
-Here's the thing—these tools aren't just individual tricks. They work together to keep things on the keyboard and in flow. Here's what that looks like with a real example.
-
-Say there's a need to switch to a project, check what branch it's on, see what files changed, and commit them. Here's how it might go:
+These tools work together to keep things on the keyboard and in flow. Say there's a need to switch to a project, check what branch it's on, see what files changed, and commit them. All without leaving the keyboard:
 
 ```bash
-z api                    # Jump to project (no typing long paths)
-gst                      # Git status (plugin shortcut, not 'git status')
-# See what changed, make edits in my editor...
-gco -b new-feature       # Create branch (shortcut, not 'git checkout -b')
-ga .                     # Stage everything (shortcut, not 'git add .')
-gc "Add feature"         # Commit (shortcut, not 'git commit -m')
+z api
+gst
+gco -b new-feature
+ga .
+gc "Add feature"
 ```
 
-All of that happens without leaving the keyboard. No Finder windows to navigate, no Git GUI to open, no mouse clicks. The prompt already shows the branch name, so there's awareness of location at a glance. Autosuggestions remind of commands that have been used before. Syntax highlighting catches typos before hitting enter.
+No Finder windows, no Git GUI, no mouse clicks. The prompt shows the branch name at a glance. Autosuggestions remind of previous commands. Syntax highlighting catches typos before hitting enter.
 
-Compare that to the alternative: opening Finder, navigating folders, opening a Git GUI app, clicking through menus, typing in dialog boxes, switching back to terminal, switching back to editor... Every one of those steps is a context switch. The brain has to shift from "coding" to "navigating" to "clicking" and back.
+Compare that to opening Finder, navigating folders, opening a Git GUI app, clicking through menus, switching back to terminal, switching back to editor... Every step is a context switch. The brain shifts from "coding" to "navigating" to "clicking" and back.
 
-The config files (`.zshrc`, `.gitconfig`) are where this gets set up once. The commands and shortcuts are what get used every day. Together, they can help keep hands on the keyboard and mind in the code.
+The config files (`.zshrc`, `.gitconfig`) get set up once. The commands and shortcuts get used every day. Together, they help keep hands on the keyboard and mind in the code.
