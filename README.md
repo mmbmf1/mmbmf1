@@ -25,7 +25,7 @@
 - 🔭 Working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
 - 🏗️ **Building** production systems with PostgreSQL and Next.js
 - 🤝 **Mentoring** developers and helping lead technical teams through system integrations
-- 🚀 **Working on** core business systems including PAID, central API, FTTH signup-tool and cross-application integrations
+- 🚀 **Working on** core business systems and cross-application integrations
 - 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
 
 ## 🏗
