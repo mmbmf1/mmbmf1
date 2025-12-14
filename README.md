@@ -22,20 +22,20 @@
 
 ## 🖖 whats up
 
-- 🔭 I'm currently working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
-- 🏗️ **Architecting and building** large production systems with PostgreSQL and Next.js
-- 🤝 **Mentoring junior developers** and helping to lead technical teams through complex system integrations
-- 🚀 **Developing** core business systems including PAID, central API, a FTTH signup-tool and cross-application integrations
+- 🔭 Working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
+- 🏗️ **Building** production systems with PostgreSQL and Next.js
+- 🤝 **Mentoring** developers and helping lead technical teams through system integrations
+- 🚀 **Working on** core business systems including PAID, central API, FTTH signup-tool and cross-application integrations
 - 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
 
 ## 🏗
 
-**Lead Full-Stack Developer** specializing in system architecture, PostgreSQL, APIs, and enterprise applications.
+**Full-Stack Developer** working with system architecture, PostgreSQL, APIs, and enterprise applications.
 
 **Interested in:**
 
-- **System Architecture**: Designing and implementing scalable APIs and database systems
-- **Technical Leadership**: Helping to mentor junior developers and helping to lead projects from requirements to deployment
+- **System Architecture**: Building scalable APIs and database systems
+- **Technical Leadership**: Mentoring developers and leading projects from requirements to deployment
 - **Cross-Application Integration**: Building unified data platforms and real-time synchronization
 - **Process Automation**: Streamlining business operations across multiple departments
 
