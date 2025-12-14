@@ -10,7 +10,7 @@ Geospatial data pipeline using PostGIS with Next.js API routes. Database-level s
 
 ## The Problem
 
-Processing coordinates in JavaScript is slow for large datasets.
+Processing coordinates in JavaScript can be slow for large datasets.
 
 ```javascript
 const features = data.map(point => ({

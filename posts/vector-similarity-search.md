@@ -10,7 +10,7 @@ Vector similarity search queries with pgvector. Find semantically similar conten
 
 ## The Problem
 
-Application-level similarity calculation is slow and doesn't scale.
+Application-level similarity calculation can be slow and may not scale well for large datasets.
 
 ```typescript
 const queryEmbedding = await generateEmbedding(query);

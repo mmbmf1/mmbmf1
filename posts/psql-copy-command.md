@@ -10,11 +10,7 @@ Import large CSV files directly into PostgreSQL using `\copy`. Fast, reliable, n
 
 ## The Problem
 
-GUI tools and custom scripts are slow and unreliable for large CSV imports.
-
-```sql
--- Manual approach - inefficient
-```
+GUI tools and custom scripts can be slow for large CSV imports. Looking for a simpler approach.
 
 ## The Solution
 

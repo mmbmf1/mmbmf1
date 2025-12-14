@@ -10,11 +10,7 @@ Keyboard-first terminal setup with zsh. Stay in flow, avoid mouse clicks, work f
 
 ## The Problem
 
-Reaching for the mouse and clicking through GUIs breaks flow and adds context switches.
-
-```bash
-# Slow - GUI navigation
-```
+Reaching for the mouse and clicking through GUIs can break flow and add context switches. Looking for ways to stay on the keyboard.
 
 ## The Solution
 

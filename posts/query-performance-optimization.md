@@ -10,7 +10,7 @@ Optimize PostgreSQL queries with indexes, efficient patterns, and query analysis
 
 ## The Problem
 
-Queries become slow as data grows without proper indexes and optimization.
+Queries can become slow as data grows without proper indexes and optimization.
 
 ```typescript
 const result = await query('SELECT * FROM users WHERE email = $1', [email]);
@@ -62,7 +62,7 @@ const explainResult = await query(
   'EXPLAIN ANALYZE SELECT * FROM users WHERE active = $1 ORDER BY created_at DESC LIMIT 20',
   [true]
 );
-// Look for "Seq Scan" (bad) vs "Index Scan" (good)
+// Look for "Seq Scan" (full table scan) vs "Index Scan" (uses index)
 ```
 
 **Select specific columns:**

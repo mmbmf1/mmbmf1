@@ -10,7 +10,7 @@ Validate request data before database operations. Clear error messages, prevents
 
 ## The Problem
 
-Minimal validation leads to unclear errors and unnecessary database load.
+Minimal validation can lead to unclear errors and unnecessary database load.
 
 ```typescript
 const { email, name } = req.body;

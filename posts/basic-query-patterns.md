@@ -10,7 +10,7 @@ Dynamic query building with parameterized filters. Efficient database-level filt
 
 ## The Problem
 
-Fetching everything and filtering in JavaScript is slow and doesn't use indexes.
+Fetching everything and filtering in JavaScript can be slow for large datasets and may not leverage database indexes effectively.
 
 ```typescript
 const result = await query('SELECT * FROM users');

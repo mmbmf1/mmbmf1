@@ -12,7 +12,7 @@ Shared connection pool for PostgreSQL in Next.js. Reuses connections across requ
 
 ## The Problem
 
-Creating new connections per request hits limits and leaks connections.
+Creating new connections per request can hit limits and potentially leak connections if cleanup is forgotten.
 
 ```typescript
 const client = new Client({ /* config */ });

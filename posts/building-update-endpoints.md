@@ -10,7 +10,7 @@ Update endpoints with dynamic query building. Supports partial updates (PATCH) a
 
 ## The Problem
 
-Updating all fields even when only one changed is inefficient. String concatenation is unsafe.
+Updating all fields even when only one changed can be inefficient. String concatenation in queries can be unsafe.
 
 ```typescript
 const sql = `UPDATE users SET email='${email}', name='${name}', role='${role}' WHERE id=${id}`;

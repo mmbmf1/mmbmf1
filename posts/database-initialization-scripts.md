@@ -10,7 +10,7 @@ Auto-run SQL scripts on first container start. Consistent schema and seed data w
 
 ## The Problem
 
-Manual script execution is error-prone and doesn't scale.
+Manual script execution can be error-prone and doesn't scale well across team members.
 
 ```bash
 docker-compose up -d

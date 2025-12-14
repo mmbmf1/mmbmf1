@@ -10,7 +10,7 @@ Use the shared database connection pool in Next.js API routes. Clean database ac
 
 ## The Problem
 
-Managing connections in every route leads to duplication and inconsistent patterns.
+Managing connections in every route can lead to duplication and inconsistent patterns.
 
 ```typescript
 export default async function handler(req, res) {

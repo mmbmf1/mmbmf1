@@ -12,7 +12,7 @@ PostGIS extension for PostgreSQL. Store geometry data, perform spatial queries, 
 
 ## The Problem
 
-Separate lat/lng columns don't support spatial queries or efficient indexing.
+Separate lat/lng columns don't support spatial queries or efficient spatial indexing.
 
 ```sql
 CREATE TABLE locations (

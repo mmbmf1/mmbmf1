@@ -10,7 +10,7 @@ Pagination with LIMIT and OFFSET. Handle large datasets efficiently with navigat
 
 ## The Problem
 
-Returning all data is slow and consumes excessive bandwidth.
+Returning all data can be slow and consume excessive bandwidth for large datasets.
 
 ```typescript
 const result = await query('SELECT * FROM users');

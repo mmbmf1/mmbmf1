@@ -10,7 +10,7 @@ DELETE endpoints with existence checks and constraint handling. Safe deletion wi
 
 ## The Problem
 
-Blind deletion doesn't verify records exist and ignores foreign key constraints.
+Deleting without checking if records exist can lead to confusing responses. Missing foreign key constraint handling can cause unclear errors.
 
 ```typescript
 const sql = `DELETE FROM users WHERE id = ${id}`;

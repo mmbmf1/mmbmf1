@@ -12,7 +12,7 @@ pgvector extension for PostgreSQL. Store and query vector embeddings. Semantic s
 
 ## The Problem
 
-Storing embeddings as JSON arrays doesn't support efficient similarity search.
+Storing embeddings as JSON arrays doesn't efficiently support similarity search operations.
 
 ```sql
 CREATE TABLE documents (

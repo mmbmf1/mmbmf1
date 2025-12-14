@@ -10,7 +10,7 @@ Sync data between PostgreSQL databases using Foreign Data Wrappers. Direct cross
 
 ## The Problem
 
-Manual exports and imports don't provide real-time access and are hard to maintain.
+Manual exports and imports may not provide real-time access and can be hard to maintain.
 
 ```sql
 COPY (SELECT * FROM source_table) TO '/tmp/export.csv';

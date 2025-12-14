@@ -10,7 +10,7 @@ GET endpoints with parameterized queries. Safe, efficient, handles filtering and
 
 ## The Problem
 
-String concatenation in queries leads to SQL injection.
+String concatenation in queries can lead to SQL injection vulnerabilities.
 
 ```typescript
 const result = await query(`SELECT * FROM users WHERE id = ${req.query.id}`);

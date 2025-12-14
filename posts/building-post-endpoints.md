@@ -10,7 +10,7 @@ POST endpoints with parameterized queries. Safe inserts, handles conflicts, retu
 
 ## The Problem
 
-String concatenation leads to SQL injection. Missing conflict handling causes poor errors.
+String concatenation in queries can lead to SQL injection vulnerabilities. Missing conflict handling can result in unclear error messages.
 
 ```typescript
 const sql = `INSERT INTO users (email, name) VALUES ('${email}', '${name}')`;

@@ -12,7 +12,7 @@ Docker-based PostgreSQL setup for local development. Isolated, easy to reset, co
 
 ## The Problem
 
-Installing PostgreSQL directly conflicts with system installations and makes cleanup difficult.
+Installing PostgreSQL directly can conflict with system installations and make cleanup more difficult.
 
 ```bash
 brew install postgresql

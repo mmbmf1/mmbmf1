@@ -10,7 +10,7 @@ Consistent error handling across API routes. Clear error responses, proper HTTP 
 
 ## The Problem
 
-Generic error messages expose database internals and provide poor user experience.
+Generic error messages can expose database internals and create a confusing experience for API consumers.
 
 ```typescript
 try {

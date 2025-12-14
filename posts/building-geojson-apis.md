@@ -10,7 +10,7 @@ Generate GeoJSON from PostGIS geometry data in Next.js APIs. Database-level spat
 
 ## The Problem
 
-Processing coordinates in JavaScript is slow for large datasets.
+Processing coordinates in JavaScript can be slow for large datasets.
 
 ```javascript
 const features = data.map(point => ({

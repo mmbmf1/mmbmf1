@@ -12,7 +12,7 @@ RAG (Retrieval Augmented Generation) API using pgvector and Next.js. Semantic se
 
 ## The Problem
 
-Sending all documents to LLMs hits token limits and doesn't scale.
+Sending all documents to LLMs can hit token limits and doesn't scale well for large document collections.
 
 ```typescript
 const allDocs = await query('SELECT content FROM documents');
