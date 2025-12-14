@@ -81,7 +81,4 @@
   <a href="https://www.alltrails.com/members/michael-mace-2" target="blank">
     <img align="center" src="./assets/alltrails-svgrepo-com.svg" alt="mmbmf1" height="30" width="30" />
   </a>
-  <a href="https://x.com/ikilledtoast" target="blank">
-    <img align="center" src="./assets/twitter.svg" alt="mmbmf1" height="30" width="30" />
-  </a>
 </p>
