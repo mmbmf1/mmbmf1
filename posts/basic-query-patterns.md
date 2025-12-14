@@ -6,35 +6,21 @@
 
 ## Introduction
 
-Built efficient query patterns for retrieving and filtering data from PostgreSQL in Next.js APIs. This approach uses parameterized queries with dynamic filtering to create flexible, performant endpoints.
+Dynamic query building with parameterized filters. Efficient database-level filtering, not JavaScript filtering.
 
 ## The Problem
 
-When building API endpoints, you need to query data with various filters and conditions. The typical approaches involve separate endpoints for each filter combination or fetching all data and filtering in JavaScript, which leads to API bloat or performance issues.
+Fetching everything and filtering in JavaScript is slow and doesn't use indexes.
 
 ```typescript
-// Inefficient approach - fetch everything, filter in JavaScript
+// Inefficient - fetch everything, filter in JavaScript
 const result = await query('SELECT * FROM users');
 const filtered = result.rows.filter(user => user.active && user.role === 'admin');
 ```
 
-This works for small datasets, but becomes slow as data grows and doesn't leverage database indexes.
-
 ## The Solution
 
-Instead of fetching everything, we build dynamic queries with parameterized filters that execute at the database level. The architecture flows from query parameters through dynamic query building to efficient database execution.
-
-### Architecture Overview
-
-Query Parameters → Dynamic Query Builder → Parameterized Query → Database → Filtered Results
-
-- **Query parameters**: Filters from request
-- **Dynamic query builder**: Constructs SQL with conditions
-- **Parameterized query**: Safe SQL with placeholders
-- **Database execution**: Uses indexes efficiently
-- **Filtered results**: Only requested data returned
-
-### Implementation
+Build dynamic queries with parameterized filters.
 
 **Basic filtering:**
 ```typescript
@@ -42,38 +28,43 @@ Query Parameters → Dynamic Query Builder → Parameterized Query → Database 
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  const { active, role, search } = req.query;
-  
-  let sql = 'SELECT * FROM users WHERE 1=1';
-  const params: any[] = [];
-  let paramCount = 0;
-  
-  if (active !== undefined) {
-    paramCount++;
-    sql += ` AND active = $${paramCount}`;
-    params.push(active === 'true');
+  try {
+    const { active, role, search } = req.query;
+    
+    let sql = 'SELECT id, email, name FROM users WHERE 1=1';
+    const params: any[] = [];
+    let paramCount = 0;
+    
+    if (active !== undefined) {
+      paramCount++;
+      sql += ` AND active = $${paramCount}`;
+      params.push(active === 'true');
+    }
+    
+    if (role) {
+      paramCount++;
+      sql += ` AND role = $${paramCount}`;
+      params.push(role);
+    }
+    
+    if (search) {
+      paramCount++;
+      sql += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
+      params.push(`%${search}%`);
+    }
+    
+    sql += ' ORDER BY created_at DESC LIMIT 50';
+    
+    const result = await query(sql, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
-  
-  if (role) {
-    paramCount++;
-    sql += ` AND role = $${paramCount}`;
-    params.push(role);
-  }
-  
-  if (search) {
-    paramCount++;
-    sql += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
-    params.push(`%${search}%`);
-  }
-  
-  sql += ' ORDER BY created_at DESC';
-  
-  const result = await query(sql, params);
-  res.json(result.rows);
 }
 ```
 
-**Filtering with type safety:**
+**Type-safe filtering:**
 ```typescript
 interface UserFilters {
   active?: boolean;
@@ -136,7 +127,7 @@ export default async function handler(req, res) {
 }
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/users/route.ts
 import { query } from '@/lib/db';
@@ -178,23 +169,18 @@ export async function GET(request: Request) {
 }
 ```
 
-### Query Patterns
-
-- **Equality filters** - Exact matches (`active = true`)
-- **Range filters** - Numeric ranges (`age BETWEEN 18 AND 65`)
-- **Text search** - Pattern matching (`ILIKE '%search%'`)
-- **Multiple conditions** - Combine filters with AND/OR
-- **Sorting** - ORDER BY for consistent results
+**Query patterns:**
+- Equality filters - `active = true`
+- Range filters - `age BETWEEN 18 AND 65`
+- Text search - `ILIKE '%search%'`
+- Multiple conditions - Combine with AND/OR
+- Sorting - `ORDER BY created_at DESC`
 
 ## Benefits
 
-This approach provides flexible querying that executes efficiently at the database level. We get parameterized queries, proper index usage, and reduced data transfer. This pattern works well for:
+- Performance - Database handles filtering efficiently
+- Flexibility - Support multiple filter combinations
+- Security - Parameterized queries prevent SQL injection
+- Scalability - Works well as data grows
 
-- **Performance** - Database handles filtering efficiently
-- **Flexibility** - Support multiple filter combinations
-- **Security** - Parameterized queries prevent SQL injection
-- **Scalability** - Works well as data grows
-
-The clean separation between filter building and query execution means endpoints are flexible and performant while maintaining security.
-
-This builds on error handling (see [error-handling-patterns.md](./error-handling-patterns.md)). Next, see how to implement pagination (see [pagination-strategies.md](./pagination-strategies.md)).
+Next: [pagination-strategies.md](./pagination-strategies.md)

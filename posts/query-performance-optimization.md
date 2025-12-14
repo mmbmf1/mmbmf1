@@ -6,39 +6,25 @@
 
 ## Introduction
 
-Optimized PostgreSQL queries in Next.js APIs to improve response times and handle larger datasets efficiently. This approach uses indexes, query analysis, and efficient patterns to reduce database load and improve user experience.
+Optimize PostgreSQL queries with indexes, efficient patterns, and query analysis. Faster responses, better scalability.
 
 ## The Problem
 
-When building API endpoints, queries can become slow as data grows. The typical approaches involve fetching more data than needed or not using indexes, which leads to slow responses and poor scalability.
+Queries become slow as data grows without proper indexes and optimization.
 
 ```typescript
-// Inefficient query - no indexes, fetches unnecessary data
+// Inefficient - no indexes, fetches unnecessary data
 const result = await query('SELECT * FROM users WHERE email = $1', [email]);
-// Then filters in JavaScript
 const activeUsers = result.rows.filter(u => u.active);
 ```
 
-This works for small datasets, but becomes slow as tables grow and doesn't leverage database optimization.
-
 ## The Solution
 
-Instead of relying on JavaScript filtering, we optimize queries at the database level using indexes, efficient query patterns, and query analysis. The architecture flows from query design through index usage to optimized execution.
-
-### Architecture Overview
-
-Query Design → Index Analysis → Optimized Query → Fast Execution
-
-- **Query design**: Structure queries for efficiency
-- **Index analysis**: Identify needed indexes
-- **Optimized query**: Use indexes and efficient patterns
-- **Fast execution**: Database handles optimization
-
-### Implementation
+Optimize at the database level with indexes and efficient patterns.
 
 **Adding indexes:**
 ```sql
--- Create indexes for common query patterns
+-- Single column indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_active ON users(active);
 CREATE INDEX idx_users_created_at ON users(created_at DESC);
@@ -47,7 +33,7 @@ CREATE INDEX idx_users_created_at ON users(created_at DESC);
 CREATE INDEX idx_users_active_created ON users(active, created_at DESC);
 ```
 
-**Efficient query patterns:**
+**Efficient queries:**
 ```typescript
 // pages/api/users.ts
 import { query } from '@/lib/db';
@@ -81,7 +67,7 @@ export default async function handler(req, res) {
 }
 ```
 
-**Using EXPLAIN to analyze queries:**
+**Query analysis:**
 ```typescript
 // Analyze query performance
 const explainResult = await query(
@@ -93,20 +79,18 @@ console.log(explainResult.rows);
 // Look for "Seq Scan" (bad) vs "Index Scan" (good)
 ```
 
-**Selecting only needed columns:**
+**Select specific columns:**
 ```typescript
 // Instead of SELECT *
 const result = await query(
   'SELECT id, email, name FROM users WHERE active = $1',
   [true]
 );
-
-// Reduces data transfer and memory usage
 ```
 
-**Using JOINs efficiently:**
+**Efficient JOINs:**
 ```typescript
-// Efficient JOIN with indexed foreign keys
+// Use indexed foreign keys
 const result = await query(`
   SELECT 
     u.id, u.email, u.name,
@@ -119,7 +103,7 @@ const result = await query(`
 `, [true]);
 ```
 
-**Connection pooling considerations:**
+**Connection pool configuration:**
 ```typescript
 // lib/db.ts - Configure pool for performance
 import { Pool } from 'pg';
@@ -133,24 +117,19 @@ const pool = new Pool({
 });
 ```
 
-### Optimization Techniques
-
-- **Indexes** - Create indexes on frequently queried columns
-- **Select specific columns** - Don't use SELECT * in production
-- **Limit results** - Always use LIMIT for list endpoints
-- **Efficient WHERE clauses** - Filter on indexed columns
-- **Avoid N+1 queries** - Use JOINs instead of multiple queries
-- **Connection pooling** - Reuse connections efficiently
+**Optimization techniques:**
+- Indexes - Create on frequently queried columns
+- Select specific columns - Don't use `SELECT *`
+- Limit results - Always use LIMIT
+- Efficient WHERE clauses - Filter on indexed columns
+- Avoid N+1 queries - Use JOINs instead of multiple queries
+- Connection pooling - Reuse connections efficiently
 
 ## Benefits
 
-This approach provides optimized queries that scale well as data grows. We get faster response times, reduced database load, and better user experience. This pattern works well for:
+- Performance - Faster query execution
+- Scalability - Handles growing datasets efficiently
+- Resource usage - Reduced database load
+- User experience - Faster API responses
 
-- **Performance** - Faster query execution
-- **Scalability** - Handles growing datasets efficiently
-- **Resource usage** - Reduced database load
-- **User experience** - Faster API responses
-
-The clean separation between query design and execution means endpoints are optimized while maintaining readability and maintainability.
-
-This builds on pagination (see [pagination-strategies.md](./pagination-strategies.md)). Next, see how to import data with CSV files (see [psql-copy-command.md](./psql-copy-command.md)).
+Next: [psql-copy-command.md](./psql-copy-command.md)

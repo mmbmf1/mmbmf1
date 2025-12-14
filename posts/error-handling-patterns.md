@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Implemented consistent error handling across Next.js API routes to provide clear error responses and proper logging. This approach standardizes error formats and HTTP status codes while handling database errors gracefully.
+Consistent error handling across API routes. Clear error responses, proper HTTP status codes, secure error messages.
 
 ## The Problem
 
-When building API endpoints, you need to handle errors consistently. The typical approaches involve generic error messages or exposing database internals, which leads to poor user experience and security issues.
+Generic error messages expose database internals and provide poor user experience.
 
 ```typescript
 // Poor error handling - exposes internals
@@ -21,22 +21,9 @@ try {
 }
 ```
 
-This works, but exposes internal errors and doesn't provide consistent error formats.
-
 ## The Solution
 
-Instead of exposing raw errors, we use error handling middleware and consistent error response formats. The architecture flows from database operations through error classification to formatted error responses.
-
-### Architecture Overview
-
-Database Operation → Error Classification → Error Response Format → Client
-
-- **Database operation**: Query execution
-- **Error classification**: Identify error type (not found, conflict, etc.)
-- **Error response format**: Consistent JSON structure
-- **Client**: Receives clear error message
-
-### Implementation
+Use error handling utilities with consistent error formats.
 
 **Error handling utility:**
 ```typescript
@@ -53,7 +40,6 @@ export class ApiError extends Error {
 }
 
 export function handleDatabaseError(error: any): ApiError {
-  // PostgreSQL error codes
   switch (error.code) {
     case '23505': // Unique violation
       return new ApiError(409, 'Resource already exists', 'CONFLICT');
@@ -85,7 +71,7 @@ export function sendErrorResponse(res: any, error: ApiError | Error) {
 }
 ```
 
-**Using error handling in routes:**
+**Using error handling:**
 ```typescript
 // pages/api/users/[id].ts
 import { query } from '@/lib/db';
@@ -126,19 +112,17 @@ export default async function handler(req, res) {
       return sendErrorResponse(res, error);
     }
     
-    // Handle database errors
     if (error.code && (error.code.startsWith('23') || error.code.startsWith('42'))) {
       const apiError = handleDatabaseError(error);
       return sendErrorResponse(res, apiError);
     }
     
-    // Unexpected errors
     sendErrorResponse(res, error);
   }
 }
 ```
 
-**App Router error handling:**
+**App Router:**
 ```typescript
 // app/api/users/[id]/route.ts
 import { query } from '@/lib/db';
@@ -181,8 +165,7 @@ export async function GET(
 }
 ```
 
-### Error Response Format
-
+**Error response format:**
 ```json
 {
   "error": "User not found",
@@ -190,22 +173,17 @@ export async function GET(
 }
 ```
 
-### Common Error Codes
-
-- **400** - Bad Request (validation errors)
-- **404** - Not Found (resource doesn't exist)
-- **409** - Conflict (unique constraint violations)
-- **500** - Internal Server Error (unexpected errors)
+**Common HTTP status codes:**
+- `400` - Bad Request (validation errors)
+- `404` - Not Found (resource doesn't exist)
+- `409` - Conflict (unique constraint violations)
+- `500` - Internal Server Error (unexpected errors)
 
 ## Benefits
 
-This approach provides consistent error handling that gives clear feedback without exposing internals. We get standardized error formats, proper HTTP status codes, and secure error messages. This pattern works well for:
+- User experience - Clear, actionable error messages
+- Security - Don't expose database internals
+- Consistency - Standardized error format
+- Debugging - Proper logging while hiding details
 
-- **User experience** - Clear, actionable error messages
-- **Security** - Don't expose database internals
-- **Consistency** - Standardized error format across endpoints
-- **Debugging** - Proper logging while hiding details from clients
-
-The clean separation between error handling and business logic means endpoints are more maintainable and provide better user experience.
-
-This builds on input validation (see [input-validation-patterns.md](./input-validation-patterns.md)). Next, see how to build efficient queries (see [basic-query-patterns.md](./basic-query-patterns.md)).
+Next: [basic-query-patterns.md](./basic-query-patterns.md)

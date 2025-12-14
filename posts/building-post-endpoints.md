@@ -6,34 +6,20 @@
 
 ## Introduction
 
-Built POST endpoints in Next.js that create new records in PostgreSQL safely. This approach uses parameterized queries and proper error handling to insert data while preventing SQL injection and handling conflicts.
+POST endpoints with parameterized queries. Safe inserts, handles conflicts, returns created records.
 
 ## The Problem
 
-When building POST endpoints, you need to insert data into the database safely. The typical approaches involve string concatenation or not handling unique constraint violations, which leads to SQL injection vulnerabilities and poor error messages.
+String concatenation leads to SQL injection. Missing conflict handling causes poor errors.
 
 ```typescript
-// Unsafe approach - SQL injection risk
+// Unsafe - SQL injection risk
 const sql = `INSERT INTO users (email, name) VALUES ('${email}', '${name}')`;
 ```
 
-This works for simple cases, but is vulnerable to SQL injection and doesn't handle errors gracefully.
-
 ## The Solution
 
-Instead of string concatenation, we use parameterized queries with proper error handling and conflict resolution. The architecture flows from request body through validation and parameterized inserts to success responses.
-
-### Architecture Overview
-
-Request Body → Validation → Parameterized Insert → Database → Success Response
-
-- **Request body**: JSON data from client
-- **Validation**: Check required fields and types
-- **Parameterized insert**: Safe SQL with placeholders
-- **Database insert**: Executes with parameters
-- **Success response**: Returns created record
-
-### Implementation
+Use parameterized queries with proper error handling.
 
 **Basic insert:**
 ```typescript
@@ -72,7 +58,7 @@ export default async function handler(req, res) {
 
 **Insert with conflict handling:**
 ```typescript
-// Handle duplicate emails gracefully
+// Upsert pattern
 const result = await query(
   `INSERT INTO users (email, name) 
    VALUES ($1, $2) 
@@ -83,7 +69,7 @@ const result = await query(
 );
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/users/route.ts
 import { query } from '@/lib/db';
@@ -124,24 +110,32 @@ export async function POST(request: Request) {
 }
 ```
 
-### Best Practices
+**Multiple inserts:**
+```typescript
+// Batch insert
+const values = users.map((_, i) => `($${i * 2 + 1}, $${i * 2 + 2})`).join(', ');
+const params = users.flatMap(u => [u.email, u.name]);
 
-- **Validate input** - Check required fields and data types
-- **Use parameterized queries** - Prevents SQL injection
-- **Handle conflicts** - Check for unique constraint violations
-- **Return created record** - Use RETURNING clause
-- **Proper status codes** - 201 for created, 409 for conflicts
-- **Error messages** - Provide helpful error responses
+const result = await query(
+  `INSERT INTO users (email, name) 
+   VALUES ${values} 
+   RETURNING *`,
+  params
+);
+```
+
+**Best practices:**
+- Validate input before database operations
+- Use parameterized queries
+- Handle unique constraint violations (code `23505`)
+- Return created record with `RETURNING *`
+- Use 201 for created, 409 for conflicts
 
 ## Benefits
 
-This approach provides safe, robust POST endpoints that handle validation and errors properly. We get SQL injection protection, proper HTTP status codes, and clear error messages. This pattern works well for:
+- Security - Prevents SQL injection
+- Reliability - Handles conflicts gracefully
+- User experience - Clear error messages
+- Maintainability - Consistent patterns
 
-- **Security** - Parameterized queries prevent SQL injection
-- **Reliability** - Proper error handling for edge cases
-- **User experience** - Clear error messages for conflicts
-- **Maintainability** - Consistent patterns across endpoints
-
-The clean separation between request handling and database operations means endpoints are secure and maintainable while providing good user feedback.
-
-This builds on GET endpoints (see [building-get-endpoints.md](./building-get-endpoints.md)). Next, see how to update data with PUT/PATCH endpoints (see [building-update-endpoints.md](./building-update-endpoints.md)).
+Next: [building-update-endpoints.md](./building-update-endpoints.md)

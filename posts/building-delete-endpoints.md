@@ -6,34 +6,20 @@
 
 ## Introduction
 
-Built DELETE endpoints in Next.js that remove records from PostgreSQL safely. This approach uses parameterized queries and proper error handling to delete data while checking for existence and handling foreign key constraints.
+DELETE endpoints with existence checks and constraint handling. Safe deletion with proper error responses.
 
 ## The Problem
 
-When building DELETE endpoints, you need to remove records safely. The typical approaches involve not checking if records exist or ignoring foreign key constraints, which leads to confusing error responses and orphaned data.
+Blind deletion doesn't verify records exist and ignores foreign key constraints.
 
 ```typescript
-// Problematic approach - no existence check
+// Problematic - no existence check
 const sql = `DELETE FROM users WHERE id = ${id}`;
 ```
 
-This works, but doesn't verify the record exists and can fail silently or cause foreign key violations.
-
 ## The Solution
 
-Instead of blind deletion, we use parameterized queries with existence checks and proper error handling for constraints. The architecture flows from route parameters through existence verification to safe deletion.
-
-### Architecture Overview
-
-Route Parameters → Existence Check → Parameterized Delete → Database → Success Response
-
-- **Route parameters**: ID from URL
-- **Existence check**: Verify record exists before deletion
-- **Parameterized delete**: Safe SQL with placeholders
-- **Database delete**: Execute with parameters
-- **Success response**: Confirm deletion
-
-### Implementation
+Check existence first, handle constraints, use parameterized queries.
 
 **Basic delete:**
 ```typescript
@@ -48,7 +34,7 @@ export default async function handler(req, res) {
   const { id } = req.query;
   
   try {
-    // Check if record exists first
+    // Check if record exists
     const checkResult = await query(
       'SELECT id FROM users WHERE id = $1',
       [id]
@@ -61,7 +47,7 @@ export default async function handler(req, res) {
     // Delete the record
     await query('DELETE FROM users WHERE id = $1', [id]);
     
-    res.status(204).send(); // No content
+    res.status(204).send();
   } catch (error: any) {
     if (error.code === '23503') { // Foreign key violation
       return res.status(409).json({ 
@@ -74,8 +60,9 @@ export default async function handler(req, res) {
 }
 ```
 
-**Delete with RETURNING (return deleted record):**
+**Delete with RETURNING:**
 ```typescript
+// Return deleted record
 const result = await query(
   'DELETE FROM users WHERE id = $1 RETURNING *',
   [id]
@@ -88,9 +75,9 @@ if (result.rows.length === 0) {
 res.json({ message: 'User deleted', user: result.rows[0] });
 ```
 
-**Soft delete (mark as deleted instead of removing):**
+**Soft delete:**
 ```typescript
-// Instead of DELETE, update deleted_at timestamp
+// Mark as deleted instead of removing
 const result = await query(
   `UPDATE users 
    SET deleted_at = NOW(), active = false 
@@ -106,7 +93,7 @@ if (result.rows.length === 0) {
 res.json({ message: 'User deleted', user: result.rows[0] });
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/users/[id]/route.ts
 import { query } from '@/lib/db';
@@ -117,7 +104,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check existence
     const checkResult = await query(
       'SELECT id FROM users WHERE id = $1',
       [params.id]
@@ -130,7 +116,6 @@ export async function DELETE(
       );
     }
     
-    // Delete
     await query('DELETE FROM users WHERE id = $1', [params.id]);
     
     return new NextResponse(null, { status: 204 });
@@ -149,24 +134,26 @@ export async function DELETE(
 }
 ```
 
-### Best Practices
+**Cascade delete:**
+```typescript
+// Delete related records first
+await query('DELETE FROM posts WHERE user_id = $1', [id]);
+await query('DELETE FROM users WHERE id = $1', [id]);
+```
 
-- **Check existence first** - Verify record exists before deletion
-- **Use parameterized queries** - Prevents SQL injection
-- **Handle foreign keys** - Check for constraint violations
-- **Consider soft deletes** - Mark as deleted instead of removing
-- **Proper status codes** - 204 for success, 404 for not found
-- **Return deleted data** - Use RETURNING if client needs confirmation
+**Best practices:**
+- Check existence before deletion
+- Use parameterized queries
+- Handle foreign key violations (code `23503`)
+- Consider soft deletes for audit trails
+- Return 204 for success, 404 for not found
+- Use `RETURNING *` if client needs confirmation
 
 ## Benefits
 
-This approach provides safe DELETE endpoints that handle existence checks and constraints properly. We get SQL injection protection, proper HTTP status codes, and clear error messages. This pattern works well for:
+- Safety - Verifies existence before deletion
+- Reliability - Handles constraints gracefully
+- User experience - Clear error messages
+- Flexibility - Supports hard and soft deletes
 
-- **Safety** - Verifies existence before deletion
-- **Reliability** - Handles foreign key constraints gracefully
-- **User experience** - Clear error messages for conflicts
-- **Flexibility** - Supports both hard and soft deletes
-
-The clean separation between request handling and database operations means delete endpoints are secure and maintainable while providing good user feedback.
-
-This builds on update endpoints (see [building-update-endpoints.md](./building-update-endpoints.md)). Next, see how to validate input properly (see [input-validation-patterns.md](./input-validation-patterns.md)).
+Next: [input-validation-patterns.md](./input-validation-patterns.md)

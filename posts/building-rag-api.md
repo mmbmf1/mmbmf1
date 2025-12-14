@@ -4,13 +4,15 @@
 
 # Building a RAG API with PostgreSQL and Next.js
 
+![RAG Architecture](./images/rag-architecture.png)
+
 ## Introduction
 
-Built a Retrieval Augmented Generation (RAG) API using pgvector, PostgreSQL, and Next.js that combines semantic search with LLM generation. This approach stores document embeddings in PostgreSQL and retrieves relevant context for LLM prompts.
+RAG (Retrieval Augmented Generation) API using pgvector and Next.js. Semantic search + LLM generation. Store embeddings, retrieve context, generate answers.
 
 ## The Problem
 
-When building AI applications, you need to provide relevant context to LLMs without exceeding token limits. The typical approaches involve sending entire documents or using separate vector databases, which is inefficient and adds complexity.
+Sending all documents to LLMs hits token limits and doesn't scale.
 
 ```typescript
 // Naive approach - sends all documents
@@ -19,24 +21,9 @@ const prompt = `Context: ${allDocs.map(d => d.content).join('\n')}\n\nQuestion: 
 const answer = await callLLM(prompt);
 ```
 
-This works for small datasets, but quickly hits token limits and doesn't scale to large document collections.
-
 ## The Solution
 
-Instead of sending all documents, we use vector similarity search to retrieve only relevant context, then combine it with the user's question for the LLM. The architecture flows from user queries through semantic search to context retrieval and LLM generation.
-
-### Architecture Overview
-
-User Query → Generate Embedding → Vector Search → Retrieve Context → LLM Prompt → Response
-
-- **User query**: Question or prompt from user
-- **Generate embedding**: Convert query to vector
-- **Vector search**: Find similar documents using pgvector
-- **Retrieve context**: Get top-k relevant documents
-- **LLM prompt**: Combine context with user question
-- **Response**: Generated answer with sources
-
-### Implementation
+Use vector similarity search to retrieve only relevant context, then combine with user question.
 
 **Document ingestion:**
 ```typescript
@@ -56,10 +43,8 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Generate embedding for document
     const embedding = await generateEmbedding(content);
     
-    // Store document with embedding
     const result = await query(
       `INSERT INTO documents (content, embedding, metadata)
        VALUES ($1, $2::vector, $3::jsonb)
@@ -94,38 +79,32 @@ export default async function handler(req, res) {
   }
   
   try {
-  
-  // Generate embedding for question
-  const queryEmbedding = await generateEmbedding(question);
-  
-  // Find similar documents
-  const searchResult = await query(
-    `SELECT 
-      id,
-      content,
-      metadata,
-      1 - (embedding <=> $1::vector) as similarity
-    FROM documents
-    WHERE embedding IS NOT NULL
-      AND (embedding <=> $1::vector) < 0.5  -- Similarity threshold
-    ORDER BY embedding <=> $1::vector
-    LIMIT $2`,
-    [JSON.stringify(queryEmbedding), topK]
-  );
-  
-  // Build context from retrieved documents
-  const context = searchResult.rows
-    .map(row => `[${row.metadata?.source || 'Document'}]: ${row.content}`)
-    .join('\n\n');
-  
-  // Truncate context if too long (LLM token limits)
-  const maxContextLength = 3000; // Adjust based on your model's context window
-  const truncatedContext = context.length > maxContextLength 
-    ? context.substring(0, maxContextLength) + '...'
-    : context;
-  
-  // Create RAG prompt
-  const prompt = `You are a helpful assistant. Use the following context to answer the question. If the context doesn't contain enough information, say so.
+    const queryEmbedding = await generateEmbedding(question);
+    
+    const searchResult = await query(
+      `SELECT 
+        id,
+        content,
+        metadata,
+        1 - (embedding <=> $1::vector) as similarity
+      FROM documents
+      WHERE embedding IS NOT NULL
+        AND (embedding <=> $1::vector) < 0.5
+      ORDER BY embedding <=> $1::vector
+      LIMIT $2`,
+      [JSON.stringify(queryEmbedding), topK]
+    );
+    
+    const context = searchResult.rows
+      .map(row => `[${row.metadata?.source || 'Document'}]: ${row.content}`)
+      .join('\n\n');
+    
+    const maxContextLength = 3000;
+    const truncatedContext = context.length > maxContextLength 
+      ? context.substring(0, maxContextLength) + '...'
+      : context;
+    
+    const prompt = `You are a helpful assistant. Use the following context to answer the question. If the context doesn't contain enough information, say so.
 
 Context:
 ${truncatedContext}
@@ -133,10 +112,9 @@ ${truncatedContext}
 Question: ${question}
 
 Answer:`;
-  
-  // Generate answer using LLM
-  const answer = await callLLM(prompt);
-  
+    
+    const answer = await callLLM(prompt);
+    
     res.json({
       question,
       answer,
@@ -188,7 +166,7 @@ export async function callLLM(prompt: string): Promise<string> {
 }
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/rag/search/route.ts
 import { query } from '@/lib/db';
@@ -214,10 +192,7 @@ export async function POST(request: Request) {
     [JSON.stringify(queryEmbedding), topK]
   );
   
-  const context = searchResult.rows
-    .map(row => row.content)
-    .join('\n\n');
-  
+  const context = searchResult.rows.map(row => row.content).join('\n\n');
   const prompt = `Context:\n${context}\n\nQuestion: ${question}\n\nAnswer:`;
   const answer = await callLLM(prompt);
   
@@ -232,25 +207,20 @@ export async function POST(request: Request) {
 }
 ```
 
-### RAG Workflow
-
-1. **Ingest documents** - Store documents with embeddings
-2. **User query** - Receive question from user
-3. **Semantic search** - Find relevant documents using vector similarity
-4. **Context retrieval** - Extract top-k most relevant documents
-5. **Prompt construction** - Combine context with user question
-6. **LLM generation** - Generate answer using LLM
-7. **Response** - Return answer with source citations
+**RAG workflow:**
+1. Ingest documents with embeddings
+2. User query → Generate embedding
+3. Vector search → Find similar documents
+4. Retrieve top-k context
+5. Build prompt with context + question
+6. Generate answer with LLM
+7. Return answer + sources
 
 ## Benefits
 
-This approach provides efficient RAG capabilities using PostgreSQL for storage and retrieval. We get semantic search, context-aware responses, and source citations without separate vector databases. This pattern works well for:
+- Question answering - Answer using document context
+- Document Q&A - Query large collections
+- Knowledge bases - Searchable systems
+- AI assistants - Context-aware responses
 
-- **Question answering** - Answer questions using document context
-- **Document Q&A** - Query large document collections
-- **Knowledge bases** - Build searchable knowledge systems
-- **AI assistants** - Provide context-aware responses
-
-The clean separation between document storage, semantic search, and LLM generation means RAG systems are efficient and maintainable.
-
-This builds on vector similarity search (see [vector-similarity-search.md](./vector-similarity-search.md)) and API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)). Together with pgvector setup (see [pgvector-setup.md](./pgvector-setup.md)), this provides a complete RAG implementation.
+Next: Complete RAG implementation ready to use.

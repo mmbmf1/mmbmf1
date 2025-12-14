@@ -1,51 +1,33 @@
 <!--
-#postgresql #fdw #dataPipeline #sql #database #etl #dataSync #postgres #foreignDataWrapper #dataEngineering #automation #batchProcessing #json #performance #scalability #cron #dataIntegration #realTimeData #localCopy #remoteDatabase
+#postgresql #fdw #datapipeline #sql #database #etl #datasync
 -->
 
-# Building a PostgreSQL FDW Data Pipeline
-
-<!-- #sql/fdw -->
+# PostgreSQL Foreign Data Wrappers (FDW)
 
 ## Introduction
 
-Built a data synchronization system using PostgreSQL Foreign Data Wrappers (FDW) to pull data from one database into another for analysis. This approach eliminates the need for traditional ETL tools while providing real-time access to cross-database data. Works with any PostgreSQL instances, including Docker-based local development (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)).
+Sync data between PostgreSQL databases using Foreign Data Wrappers. Direct cross-database queries without ETL tools.
 
 ## The Problem
 
-When working with multiple databases, you need to synchronize data between them for analysis and reporting. Traditional approaches involve complex ETL pipelines, scheduled jobs, or manual data exports that are difficult to maintain and don't provide real-time access.
-
-Here's what that looks like:
+Manual exports and imports don't provide real-time access and are hard to maintain.
 
 ```sql
--- Manual approach - inefficient and error-prone
--- Export data from source
+-- Manual approach - inefficient
 COPY (SELECT * FROM source_table) TO '/tmp/export.csv';
-
--- Import to target
 COPY target_table FROM '/tmp/export.csv';
-
--- Repeat manually or with complex cron jobs
 ```
-
-This works, but doesn't leverage PostgreSQL's built-in cross-database capabilities.
 
 ## The Solution
 
-Instead of manual exports and imports, we built a data pipeline using PostgreSQL Foreign Data Wrappers (FDW) that provides direct access to remote database tables. The architecture flows from source database through foreign server connections to local foreign tables, enabling real-time cross-database queries.
+Use Foreign Data Wrappers to query remote databases directly.
 
-### Architecture Overview
-
-Source Database → Foreign Server → Foreign Tables → Target Database
-
-- **Source Database:** Database containing the original data
-- **Foreign Server:** Connection to source PostgreSQL instance  
-- **Foreign Tables:** Mappings to source tables in target database
-- **Target Database:** Database for analysis and processing
-
-### Implementation
-
+**Setup:**
 ```sql
--- Create foreign server connection
+-- Enable extension
+CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+
+-- Create foreign server
 CREATE SERVER source_server
 FOREIGN DATA WRAPPER postgres_fdw
 OPTIONS (host 'source-host', port '5432', dbname 'source_database');
@@ -66,14 +48,26 @@ SERVER source_server
 OPTIONS (schema_name 'data', table_name 'properties');
 ```
 
-### Data Synchronization
-
+**Query foreign table:**
 ```sql
--- Basic sync pattern
+-- Direct query
+SELECT * FROM source_properties WHERE latitude > 40;
+
+-- Join with local tables
+SELECT 
+    l.name,
+    f.property_id
+FROM local_locations l
+JOIN source_properties f ON ST_DWithin(l.coords, f.coords, 1000);
+```
+
+**Sync data:**
+```sql
+-- Basic sync
 TRUNCATE TABLE data.properties;
 INSERT INTO data.properties SELECT * FROM source_properties;
 
--- Batch processing for large datasets
+-- Batch sync for large datasets
 DO $$
 DECLARE
     batch_size INTEGER := 5000;
@@ -93,16 +87,32 @@ BEGIN
 END $$;
 ```
 
+**Update foreign table:**
+```sql
+-- Refresh foreign table definition
+DROP FOREIGN TABLE source_properties;
+CREATE FOREIGN TABLE source_properties (...)
+SERVER source_server
+OPTIONS (schema_name 'data', table_name 'properties');
+```
+
+**Cleanup:**
+```sql
+-- Drop foreign table
+DROP FOREIGN TABLE source_properties;
+
+-- Drop user mapping
+DROP USER MAPPING FOR CURRENT_USER SERVER source_server;
+
+-- Drop server
+DROP SERVER source_server;
+```
+
 ## Benefits
 
-This approach provides direct database-level access to cross-database data. We get real-time synchronization and query capabilities without additional infrastructure. This pattern works well for:
+- Real-time access - Query remote data directly
+- No ETL tools - Built into PostgreSQL
+- Flexible - Join local and remote tables
+- Efficient - Database-level operations
 
-- **Development → Production** data sync
-- **Analytics → Operational** database connections  
-- **Multi-region** database synchronization
-- **Legacy → Modern** system migrations
-- **Cloud → On-prem** data pipelines
-
-The clean separation between foreign server connections and local processing means the heavy lifting happens in PostgreSQL while maintaining full SQL query capabilities.
-
-Once data is synchronized, you can query it through Next.js API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)) or process it for specific use cases like geospatial data (see [building-geojson-apis.md](./building-geojson-apis.md)).
+Next: [nextjs-api-routes.md](./nextjs-api-routes.md) | [building-geojson-apis.md](./building-geojson-apis.md)

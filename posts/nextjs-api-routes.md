@@ -6,14 +6,14 @@
 
 ## Introduction
 
-Built Next.js API routes that use the PostgreSQL connection pool to handle database queries. This approach provides clean database access in API endpoints without managing connections manually.
+Use the shared database connection pool in Next.js API routes. Clean database access without connection management.
 
 ## The Problem
 
-When building API routes in Next.js, you need to query the database efficiently. The typical approaches involve importing connection code in every route or recreating database clients, which leads to code duplication and inconsistent patterns.
+Managing connections in every route leads to duplication and inconsistent patterns.
 
 ```typescript
-// Inconsistent approach - connection logic in every route
+// Inconsistent - connection logic in every route
 export default async function handler(req, res) {
   const pool = new Pool({ /* config */ });
   const result = await pool.query('SELECT * FROM users');
@@ -21,67 +21,18 @@ export default async function handler(req, res) {
 }
 ```
 
-This works, but duplicates connection setup in every route and doesn't leverage connection pooling.
-
 ## The Solution
 
-Instead of managing connections in each route, we import the shared database client and use it directly. The architecture flows from the connection pool through API routes to database queries.
+Import the shared database client and use it directly.
 
-### Architecture Overview
-
-Connection Pool → API Route → Database Query → Response
-
-- **Connection pool**: Shared database client (from [postgresql-connection-pooling.md](./postgresql-connection-pooling.md))
-- **API route**: Next.js API endpoint handler
-- **Database query**: Uses pooled connection
-- **Response**: Returns data to client
-
-### Implementation
-
+**Pages Router:**
 ```typescript
-// pages/api/users.ts (Pages Router)
-import { query } from '@/lib/db';
-
-export default async function handler(req, res) {
-  const result = await query('SELECT * FROM users WHERE active = $1', [true]);
-  res.json(result.rows);
-}
-```
-
-```typescript
-// app/api/users/route.ts (App Router)
-import { query } from '@/lib/db';
-import { NextResponse } from 'next/server';
-
-export async function GET() {
-  const result = await query('SELECT * FROM users WHERE active = $1', [true]);
-  return NextResponse.json(result.rows);
-}
-```
-
-### Environment Configuration
-
-Connection details come from environment variables, making it easy to switch between local Docker and production:
-
-```bash
-# .env.local
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB=your_database
-```
-
-The same code works for both environments—just change the environment variables.
-
-### Error Handling
-
-```typescript
+// pages/api/users.ts
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
   try {
-    const result = await query('SELECT * FROM users');
+    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
     res.json(result.rows);
   } catch (error) {
     console.error('Database error:', error);
@@ -90,15 +41,82 @@ export default async function handler(req, res) {
 }
 ```
 
+**App Router:**
+```typescript
+// app/api/users/route.ts
+import { query } from '@/lib/db';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json(
+      { error: 'Database query failed' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+**Environment configuration (.env.local):**
+```bash
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB=your_database
+```
+
+**Query with parameters:**
+```typescript
+// Dynamic queries
+const { id, active } = req.query;
+
+const result = await query(
+  'SELECT * FROM users WHERE id = $1 AND active = $2',
+  [id, active === 'true']
+);
+```
+
+**Multiple queries:**
+```typescript
+// Sequential queries
+const userResult = await query('SELECT * FROM users WHERE id = $1', [id]);
+const postsResult = await query('SELECT * FROM posts WHERE user_id = $1', [id]);
+
+// Parallel queries
+const [userResult, postsResult] = await Promise.all([
+  query('SELECT * FROM users WHERE id = $1', [id]),
+  query('SELECT * FROM posts WHERE user_id = $1', [id])
+]);
+```
+
+**Transaction example:**
+```typescript
+import pool from '@/lib/db';
+
+const client = await pool.connect();
+try {
+  await client.query('BEGIN');
+  await client.query('INSERT INTO users (email) VALUES ($1)', [email]);
+  await client.query('INSERT INTO profiles (user_id) VALUES ($1)', [userId]);
+  await client.query('COMMIT');
+} catch (error) {
+  await client.query('ROLLBACK');
+  throw error;
+} finally {
+  client.release();
+}
+```
+
 ## Benefits
 
-This approach provides clean database access in API routes with automatic connection management. We get consistent patterns, efficient connection reuse, and simple error handling. This pattern works well for:
+- Consistency - Same pattern everywhere
+- Performance - Connection pooling handles efficiency
+- Simplicity - Import and use
+- Flexibility - Works with Docker and production
 
-- **Consistency** - Same database access pattern across all routes
-- **Performance** - Connection pooling handles efficiency
-- **Simplicity** - Import and use, no connection management
-- **Flexibility** - Works with Docker local dev and production
-
-The clean separation between connection management and route logic means API routes focus on business logic while the connection pool handles database efficiency.
-
-This builds on connection pooling (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)). Next, see how to build specific endpoint types (see [building-get-endpoints.md](./building-get-endpoints.md)).
+Next: [building-get-endpoints.md](./building-get-endpoints.md)

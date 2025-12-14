@@ -6,35 +6,22 @@
 
 ## Introduction
 
-Configured Docker volumes for PostgreSQL data persistence so database contents survive container restarts and removals. This approach keeps data separate from container lifecycle while maintaining easy reset capabilities.
+Docker volumes keep PostgreSQL data separate from containers. Data survives restarts, easy to reset when needed.
 
 ## The Problem
 
-When you stop or remove a Docker container, all data inside it is lost by default. For databases, you need data to persist across container restarts, but you also want the ability to reset everything when needed. The typical approaches involve managing data directories manually or losing data on every container restart.
+Container data is lost when containers stop or are removed.
 
 ```bash
-# Problem: Data lost when container stops
+# Data lost when container stops
 docker-compose down
 docker-compose up -d
-# All data is gone
+# All data gone
 ```
-
-This works for stateless containers, but databases need persistence while maintaining the ability to reset.
 
 ## The Solution
 
-Instead of storing data inside the container, we use Docker volumes to store database data outside the container filesystem. The architecture flows from container configuration through volume mapping to persistent data storage.
-
-### Architecture Overview
-
-Container → Volume Mapping → Persistent Storage → Data Survives Restarts
-
-- **Volume declaration**: Named volume in docker-compose.yml
-- **Volume mapping**: Container directory mapped to volume
-- **Persistent storage**: Data stored on host filesystem
-- **Lifecycle independence**: Data survives container removal
-
-### Implementation
+Use named volumes to persist data outside containers.
 
 ```yaml
 # docker-compose.yml
@@ -48,33 +35,26 @@ volumes:
   postgres_data:
 ```
 
-The `postgres_data` volume stores all database files in Docker's managed storage, separate from the container.
-
-### Data Lifecycle
-
-**Data persists:**
+**Data lifecycle:**
 ```bash
-# Stop container - data stays
+# Data persists through restarts
 docker-compose down
-
-# Start again - data is still there
 docker-compose up -d
+# Data still there
 
-# Restart container - data persists
-docker-compose restart db
-```
+# Data persists through container removal
+docker-compose down
+docker-compose rm db
+docker-compose up -d
+# Data still there
 
-**Data deleted:**
-```bash
-# Remove volumes - deletes all data
+# Delete data (removes volumes)
 docker-compose down -v
-
-# Start fresh - initialization scripts run again
 docker-compose up -d
+# Fresh database, initialization scripts run again
 ```
 
-### Volume Management
-
+**Volume management:**
 ```bash
 # List volumes
 docker volume ls
@@ -89,15 +69,26 @@ docker volume rm posts_postgres_data
 docker volume prune
 ```
 
+**Volume location:**
+- Linux: `/var/lib/docker/volumes/`
+- macOS/Windows: Managed by Docker Desktop
+
+**Backup volume:**
+```bash
+# Backup
+docker run --rm -v posts_postgres_data:/data -v $(pwd):/backup \
+  alpine tar czf /backup/postgres_backup.tar.gz /data
+
+# Restore
+docker run --rm -v posts_postgres_data:/data -v $(pwd):/backup \
+  alpine tar xzf /backup/postgres_backup.tar.gz -C /
+```
+
 ## Benefits
 
-This approach provides controlled data persistence that balances durability with flexibility. We get data that survives restarts while maintaining easy reset capabilities. This pattern works well for:
+- Data persists - Survives restarts
+- Easy reset - Remove volumes to start fresh
+- Team consistency - Same persistence behavior
+- Easy cleanup - One command to reset
 
-- **Development workflows** - Data persists between coding sessions
-- **Testing scenarios** - Reset to clean state when needed
-- **Team consistency** - Same data persistence behavior everywhere
-- **Easy cleanup** - One command to reset everything
-
-The clean separation between container lifecycle and data storage means you can restart, update, or reset containers without losing data unless explicitly intended.
-
-This works with Docker setup (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)) and initialization scripts (see [database-initialization-scripts.md](./database-initialization-scripts.md)). Once data is configured, connect your application (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)).
+Next: [database-initialization-scripts.md](./database-initialization-scripts.md) | [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)

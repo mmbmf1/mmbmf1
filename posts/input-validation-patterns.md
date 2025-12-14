@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Implemented input validation for Next.js API routes to ensure data integrity and provide clear error messages. This approach validates request data before database operations, preventing invalid data and improving user experience.
+Validate request data before database operations. Clear error messages, prevents invalid data.
 
 ## The Problem
 
-When building API endpoints, you need to validate incoming data before processing. The typical approaches involve minimal validation or validating in the database, which leads to unclear error messages and unnecessary database load.
+Minimal validation leads to unclear errors and unnecessary database load.
 
 ```typescript
 // Minimal validation - unclear errors
@@ -18,24 +18,11 @@ const { email, name } = req.body;
 const result = await query('INSERT INTO users (email, name) VALUES ($1, $2)', [email, name]);
 ```
 
-This works, but database errors are cryptic and don't provide helpful feedback to API consumers.
-
 ## The Solution
 
-Instead of relying on database validation, we validate input in the API layer before database operations. The architecture flows from request body through validation functions to either error responses or database operations.
+Validate in the API layer before database operations.
 
-### Architecture Overview
-
-Request Body → Validation Functions → Error Response OR Database Operation
-
-- **Request body**: Incoming JSON data
-- **Validation functions**: Check data types, formats, constraints
-- **Error response**: Return validation errors with details
-- **Database operation**: Proceed if validation passes
-
-### Implementation
-
-**Basic validation:**
+**Manual validation:**
 ```typescript
 // pages/api/users.ts
 import { query } from '@/lib/db';
@@ -99,7 +86,7 @@ export default async function handler(req, res) {
 }
 ```
 
-**Using Zod for validation:**
+**Using Zod:**
 ```typescript
 import { z } from 'zod';
 import { query } from '@/lib/db';
@@ -186,24 +173,19 @@ export async function POST(request: Request) {
 }
 ```
 
-### Validation Patterns
-
-- **Type checking** - Verify data types match expectations
-- **Format validation** - Check email, URL, date formats
-- **Range validation** - Ensure numbers are within bounds
-- **Required fields** - Check for presence of required data
-- **String length** - Validate minimum/maximum lengths
-- **Custom rules** - Business logic validation
+**Validation patterns:**
+- Type checking - Verify data types
+- Format validation - Email, URL, date formats
+- Range validation - Number bounds
+- Required fields - Check presence
+- String length - Min/max lengths
+- Custom rules - Business logic
 
 ## Benefits
 
-This approach provides clear validation that catches errors before database operations. We get better error messages, reduced database load, and improved user experience. This pattern works well for:
+- User experience - Clear, actionable errors
+- Performance - Catch errors before database queries
+- Data integrity - Only valid data reaches database
+- Maintainability - Centralized validation logic
 
-- **User experience** - Clear, actionable error messages
-- **Performance** - Catch errors before database queries
-- **Data integrity** - Ensure only valid data reaches database
-- **Maintainability** - Centralized validation logic
-
-The clean separation between validation and database operations means endpoints are more robust and provide better feedback to API consumers.
-
-This builds on POST endpoints (see [building-post-endpoints.md](./building-post-endpoints.md)). Next, see how to handle errors consistently (see [error-handling-patterns.md](./error-handling-patterns.md)).
+Next: [error-handling-patterns.md](./error-handling-patterns.md)

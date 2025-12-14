@@ -4,41 +4,30 @@
 
 # PostgreSQL Connection Pooling in Next.js
 
+![Connection Pooling Architecture](./images/connection-pooling.png)
+
 ## Introduction
 
-Set up connection pooling for PostgreSQL in Next.js API routes to efficiently manage database connections across requests. This approach reuses connections instead of creating new ones for each request, improving performance and preventing connection exhaustion.
+Shared connection pool for PostgreSQL in Next.js. Reuses connections across requests, prevents leaks, improves performance.
 
 ## The Problem
 
-When building Next.js APIs that need database access, you need to establish PostgreSQL connections efficiently. The typical approaches involve creating new connections for each request or manually managing connection pools, which leads to connection leaks and poor performance.
+Creating new connections per request hits limits and leaks connections.
 
 ```typescript
-// Manual approach - creates new connection per request, easy to leak
+// Bad - new connection every request
 const client = new Client({ /* config */ });
 await client.connect();
 const result = await client.query('SELECT * FROM users');
 await client.end(); // Easy to forget
 ```
 
-This works, but creates a new connection for every request, doesn't handle connection pooling, and makes it easy to forget cleanup. Connection limits get hit quickly under load.
-
 ## The Solution
 
-Instead of creating connections per request, we use a shared connection pool that's initialized once and reused across requests. The architecture flows from environment configuration through a singleton database client to Next.js API routes.
-
-### Architecture Overview
-
-Environment Variables → Database Client Singleton → Connection Pool → API Routes
-
-- **Environment variables**: Database connection configuration
-- **Database client**: Singleton instance with connection pooling
-- **Connection pool**: Reuses connections efficiently
-- **API routes**: Clean database access without connection management
-
-### Implementation
+Use a singleton connection pool initialized once.
 
 ```typescript
-// lib/db.ts - Shared connection pool
+// lib/db.ts
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -47,7 +36,7 @@ const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB || 'your_database',
-  max: 20, // Maximum pool size
+  max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
@@ -59,27 +48,43 @@ export async function query(text: string, params?: any[]) {
 export default pool;
 ```
 
-The pool manages connections automatically—creating new ones as needed, reusing idle connections, and cleaning up when requests complete. No manual connection management required.
+**Usage in API routes:**
+```typescript
+// pages/api/users.ts
+import { query } from '@/lib/db';
 
-**Error handling**: The pool automatically handles connection failures by removing failed connections and creating new ones. For application-level error handling, wrap queries in try-catch blocks.
+export default async function handler(req, res) {
+  try {
+    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+}
+```
 
-### How Connection Pooling Works
+**Environment variables (.env.local):**
+```bash
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB=your_database
+```
 
-- **Pool creation**: Initialized once when module loads
-- **Connection reuse**: Idle connections are reused for new queries
-- **Automatic scaling**: Creates new connections up to `max` limit
-- **Cleanup**: Idle connections timeout and close automatically
-- **Error handling**: Failed connections are removed and replaced
+**How it works:**
+- Pool created once when module loads
+- Connections reused across requests
+- Auto-scales up to `max` limit
+- Failed connections replaced automatically
+- Idle connections timeout and close
 
 ## Benefits
 
-This approach provides efficient database access with automatic connection management. We get connection pooling, proper resource cleanup, and better performance without manual connection handling. This pattern works well for:
+- Performance - Reuses connections
+- Reliability - Auto-manages connections
+- Scalability - Handles concurrent requests
+- Simplicity - No manual connect/disconnect
 
-- **Performance** - Connection pooling reduces overhead and connection churn
-- **Reliability** - Automatic connection management prevents leaks
-- **Scalability** - Handles concurrent requests efficiently
-- **Simplicity** - No manual connect/disconnect in every route
-
-The clean separation between connection management and API logic means database access is efficient and maintainable while Next.js handles the HTTP layer.
-
-This builds on Docker setup (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)). Next, see how to use this connection in API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)).
+Next: [nextjs-api-routes.md](./nextjs-api-routes.md)

@@ -1,33 +1,27 @@
-# psql \copy: CSV import that actually works
+<!--
+#postgresql #csv #import #database #etl #data
+-->
+
+# CSV Import with psql \copy
 
 ## Introduction
 
-Had an 83MB CSV with 195k+ rows that needed to go into PostgreSQL. Didn't know psql had a `\copy` command, so I wanted to learn how to use it. This works with any PostgreSQL instance, including Docker-based local development databases (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)). Once data is imported, you can query it through your application (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)).
+Import large CSV files directly into PostgreSQL using `\copy`. Fast, reliable, no external tools needed.
 
 ## The Problem
 
-When working with large CSV files, you need to get data into PostgreSQL for analysis. The typical approaches involve GUI tools or complex setup that can be slow and unreliable.
+GUI tools and custom scripts are slow and unreliable for large CSV imports.
 
 ```sql
--- Manual approach - inefficient and error-prone
--- Using pgAdmin or other GUI tools
--- Or writing custom import scripts
+-- Manual approach - inefficient
+-- Using pgAdmin or custom import scripts
 ```
-
-This works for small files, but becomes problematic with larger datasets.
 
 ## The Solution
 
-Instead of external tools, we use psql's `\copy` command that provides direct database-level CSV import capabilities.
+Use psql's `\copy` command for direct database-level CSV import.
 
-```sql
-\copy staging_table FROM '/path/to/file.csv' WITH (FORMAT csv, HEADER true);
-```
-
-That's it. No GUI, no complex setup, just works.
-
-### Implementation
-
+**Basic import:**
 ```sql
 -- Create table structure to match CSV
 CREATE TABLE staging_table (
@@ -37,31 +31,58 @@ CREATE TABLE staging_table (
     column3 TIMESTAMP
 );
 
--- Import data with one command
+-- Import data
 \copy staging_table FROM '/path/to/file.csv' WITH (FORMAT csv, HEADER true);
 
 -- Verify import
 SELECT COUNT(*) FROM staging_table;
 ```
 
-### Scripting the Workflow
-
+**Command line:**
 ```bash
-# Create table, import data, run queries - all in one go
-psql -d your_db -c "CREATE TABLE staging_table (...);"
-psql -d your_db -c "\copy staging_table FROM 'file.csv' WITH (FORMAT csv, HEADER true);"
-psql -d your_db -c "SELECT COUNT(*) FROM staging_table;"
+# Connect and import
+psql -d your_database -c "\copy staging_table FROM '/path/to/file.csv' WITH (FORMAT csv, HEADER true);"
+
+# Or from psql prompt
+psql -d your_database
+\copy staging_table FROM '/path/to/file.csv' WITH (FORMAT csv, HEADER true);
 ```
+
+**Options:**
+```sql
+-- With delimiter
+\copy table FROM 'file.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',');
+
+-- Skip header row
+\copy table FROM 'file.csv' WITH (FORMAT csv, HEADER false);
+
+-- Specify columns
+\copy table (col1, col2, col3) FROM 'file.csv' WITH (FORMAT csv, HEADER true);
+
+-- Export to CSV
+\copy table TO '/path/to/output.csv' WITH (FORMAT csv, HEADER true);
+```
+
+**Docker container:**
+```bash
+# Copy file into container first
+docker cp file.csv container_name:/tmp/file.csv
+
+# Then import
+docker exec -i container_name psql -U postgres -d your_database -c "\copy staging_table FROM '/tmp/file.csv' WITH (FORMAT csv, HEADER true);"
+```
+
+**Common issues:**
+- File path must be accessible to PostgreSQL server
+- Use `COPY` (server-side) or `\copy` (client-side)
+- Ensure table structure matches CSV columns
+- Handle NULL values and data type mismatches
 
 ## Benefits
 
-This approach uses PostgreSQL's native CSV processing capabilities. We get efficient large file handling and direct database integration without additional tools. This pattern works well for:
+- Fast - Direct database import
+- Reliable - Native PostgreSQL support
+- Simple - One command
+- Flexible - Works with any CSV format
 
-- **Data analysis projects** - Quick CSV to database conversion
-- **ETL pipelines** - Reliable data import processes  
-- **Development workflows** - Fast data setup for testing
-- **Data migration** - Moving CSV data into production systems
-
-The clean integration with PostgreSQL means the heavy lifting happens at the database level while maintaining full SQL query capabilities.
-
-After importing data, you can query it directly through your Next.js API (see [nextjs-api-routes.md](./nextjs-api-routes.md)) or sync it between databases using Foreign Data Wrappers (see [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md)).
+Next: [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md) | [nextjs-api-routes.md](./nextjs-api-routes.md)

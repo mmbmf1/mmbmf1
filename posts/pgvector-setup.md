@@ -4,46 +4,35 @@
 
 # PostgreSQL Vector Search with pgvector
 
+![Vector Similarity Search](./images/vector-search.png)
+
 ## Introduction
 
-Set up pgvector extension in PostgreSQL for storing and querying vector embeddings. This approach enables semantic search, similarity matching, and AI-powered features directly in the database.
+pgvector extension for PostgreSQL. Store and query vector embeddings. Semantic search, similarity matching, AI features in the database.
 
 ## The Problem
 
-When building applications with AI features, you need to store and search vector embeddings. The typical approaches involve using separate vector databases or storing embeddings as JSON arrays, which adds complexity and doesn't leverage PostgreSQL's capabilities.
+Storing embeddings as JSON arrays doesn't support efficient similarity search.
 
 ```sql
 -- Basic approach - no vector capabilities
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
     content TEXT,
-    embedding JSONB  -- Stored as array, can't query efficiently
+    embedding JSONB  -- Can't query efficiently
 );
 ```
 
-This works, but doesn't support efficient similarity search or leverage database indexes for vector operations.
-
 ## The Solution
 
-Instead of storing embeddings as JSON, we use pgvector's vector type and similarity search functions. The architecture flows from pgvector extension through vector columns to efficient similarity queries.
+Use pgvector's `vector` type and similarity operators.
 
-### Architecture Overview
-
-pgvector Extension → Vector Columns → Vector Indexes → Similarity Queries
-
-- **pgvector extension**: Enables vector capabilities
-- **Vector columns**: Store embeddings as vector type
-- **Vector indexes**: HNSW or IVFFlat indexes for fast search
-- **Similarity queries**: Cosine, L2, or inner product similarity
-
-### Implementation
-
-**Docker setup with pgvector:**
+**Docker setup:**
 ```yaml
 # docker-compose.yml
 services:
   db:
-    image: ankane/pgvector:latest  # pgvector-enabled image
+    image: ankane/pgvector:latest
     container_name: postgres_dev_db
     environment:
       POSTGRES_USER: postgres
@@ -55,18 +44,16 @@ services:
       - postgres_data:/var/lib/postgresql/data
 ```
 
-**Alternative**: Install pgvector on standard PostgreSQL image using a custom Dockerfile or use `pgvector/pgvector:pg15` if available.
-
-**Enable pgvector extension:**
+**Enable extension:**
 ```sql
--- Enable pgvector extension
+-- Enable pgvector
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- Verify installation
+-- Verify
 SELECT * FROM pg_extension WHERE extname = 'vector';
 ```
 
-**Create table with vector column:**
+**Create table with vector:**
 ```sql
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
@@ -74,7 +61,7 @@ CREATE TABLE documents (
     embedding vector(1536)  -- OpenAI ada-002 dimension
 );
 
--- Create HNSW index for fast similarity search
+-- HNSW index for fast similarity search
 CREATE INDEX ON documents 
 USING hnsw (embedding vector_cosine_ops);
 ```
@@ -89,7 +76,7 @@ INSERT INTO documents (content, embedding) VALUES
     );
 ```
 
-**Basic similarity search:**
+**Similarity search:**
 ```sql
 -- Find similar documents using cosine similarity
 SELECT 
@@ -101,22 +88,26 @@ ORDER BY embedding <=> '[0.1, 0.2, 0.3, ...]'::vector
 LIMIT 5;
 ```
 
-### pgvector Operators
+**pgvector operators:**
+- `<=>` - Cosine distance (1 - cosine similarity)
+- `<->` - L2 distance (Euclidean)
+- `<#)` - Negative inner product
 
-- **<=>** - Cosine distance (1 - cosine similarity)
-- **<->** - L2 distance (Euclidean)
-- **<#)** - Negative inner product
-- **Similarity ranges**: 0 (identical) to 2 (opposite) for cosine distance
+**Index types:**
+```sql
+-- HNSW index (recommended for large datasets)
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops);
+
+-- IVFFlat index (faster to build, slower queries)
+CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops) 
+WITH (lists = 100);
+```
 
 ## Benefits
 
-This approach provides efficient vector storage and similarity search directly in PostgreSQL. We get fast similarity queries, standard SQL interface, and no need for separate vector databases. This pattern works well for:
+- Semantic search - Find similar content by meaning
+- AI features - Store and query embeddings efficiently
+- Simplicity - No separate vector database
+- Performance - Vector indexes enable fast queries
 
-- **Semantic search** - Find similar content by meaning
-- **AI features** - Store and query embeddings efficiently
-- **Simplicity** - No separate vector database needed
-- **Performance** - Vector indexes enable fast queries
-
-The clean separation between vector storage and queries means semantic search operations are efficient and maintainable.
-
-This builds on Docker setup (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)). Next, see how to implement vector similarity search patterns (see [vector-similarity-search.md](./vector-similarity-search.md)).
+Next: [vector-similarity-search.md](./vector-similarity-search.md)

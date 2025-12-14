@@ -6,14 +6,14 @@
 
 ## Introduction
 
-Built vector similarity search queries using pgvector to find semantically similar content. This approach uses cosine similarity and vector indexes to enable fast semantic search directly in PostgreSQL.
+Vector similarity search queries with pgvector. Find semantically similar content using cosine similarity and vector indexes.
 
 ## The Problem
 
-When building semantic search features, you need to find documents similar to a query based on meaning rather than keywords. The typical approaches involve using separate vector databases or calculating similarities in application code, which adds complexity and doesn't leverage PostgreSQL's capabilities.
+Application-level similarity calculation is slow and doesn't scale.
 
 ```typescript
-// Application-level approach - inefficient
+// Inefficient - fetch all, calculate in JavaScript
 const queryEmbedding = await generateEmbedding(query);
 const allDocs = await query('SELECT id, content, embedding FROM documents');
 const similarities = allDocs.map(doc => ({
@@ -23,22 +23,9 @@ const similarities = allDocs.map(doc => ({
 const results = similarities.sort((a, b) => b.similarity - a.similarity).slice(0, 10);
 ```
 
-This works, but requires fetching all documents and calculating similarities in JavaScript, which is slow and doesn't scale.
-
 ## The Solution
 
-Instead of application-level similarity calculation, we use pgvector's similarity operators and indexes to perform efficient vector searches at the database level. The architecture flows from query embeddings through vector similarity operators to ranked results.
-
-### Architecture Overview
-
-Query Embedding → Vector Similarity Operator → Vector Index → Ranked Results
-
-- **Query embedding**: Vector representation of search query
-- **Similarity operator**: pgvector <=> operator for cosine distance
-- **Vector index**: HNSW index for fast approximate search
-- **Ranked results**: Documents ordered by similarity
-
-### Implementation
+Use pgvector similarity operators at the database level.
 
 **Basic similarity search:**
 ```typescript
@@ -54,7 +41,6 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Generate embedding for query
     const queryEmbedding = await generateEmbedding(q as string);
     
     const result = await query(
@@ -84,9 +70,9 @@ export default async function handler(req, res) {
 }
 ```
 
-**Similarity search with threshold:**
+**Similarity threshold:**
 ```typescript
-// Only return results above similarity threshold
+// Only return results above threshold
 const result = await query(
   `SELECT 
     id,
@@ -103,7 +89,7 @@ const result = await query(
 
 **Hybrid search (vector + keyword):**
 ```typescript
-// Combine semantic search with keyword filtering
+// Combine semantic and keyword search
 const result = await query(
   `SELECT 
     id,
@@ -121,10 +107,11 @@ const result = await query(
 );
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/search/route.ts
 import { query } from '@/lib/db';
+import { generateEmbedding } from '@/lib/embeddings';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -159,29 +146,17 @@ export async function GET(request: Request) {
 }
 ```
 
-### Similarity Metrics
-
-- **Cosine similarity** - Measures angle between vectors (0-1, higher is more similar)
-- **Cosine distance** - 1 - cosine similarity (0-2, lower is more similar)
-- **L2 distance** - Euclidean distance between vectors
-- **Inner product** - Dot product of vectors
-
-### Performance Tips
-
-- **Use HNSW indexes** - Fast approximate search for large datasets
-- **Set index parameters** - Tune m and ef_construction for your use case
-- **Limit results** - Always use LIMIT to avoid large result sets
-- **Filter before search** - Apply WHERE clauses before similarity calculation when possible
+**Similarity metrics:**
+- Cosine similarity - 0-1, higher is more similar
+- Cosine distance - 0-2, lower is more similar
+- L2 distance - Euclidean distance
+- Inner product - Dot product
 
 ## Benefits
 
-This approach provides efficient semantic search directly in PostgreSQL. We get fast similarity queries, no separate vector database needed, and standard SQL interface. This pattern works well for:
+- Semantic search - Find content by meaning
+- Performance - Database-level operations
+- Flexibility - Combine with keyword search
+- Scalability - Works with large datasets
 
-- **Semantic search** - Find content by meaning, not just keywords
-- **Recommendation systems** - Find similar items
-- **Content discovery** - Surface related content
-- **AI features** - Enable LLM-powered search
-
-The clean separation between vector storage and similarity search means semantic search operations are efficient and maintainable.
-
-This builds on pgvector setup (see [pgvector-setup.md](./pgvector-setup.md)) and API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)). Next, see how to build a complete RAG API (see [building-rag-api.md](./building-rag-api.md)).
+Next: [building-rag-api.md](./building-rag-api.md)

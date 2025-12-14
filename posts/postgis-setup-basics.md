@@ -4,13 +4,15 @@
 
 # PostGIS Setup and Geospatial Basics
 
+![PostGIS Spatial Queries](./images/postgis-queries.png)
+
 ## Introduction
 
-Set up PostGIS extension in PostgreSQL for geospatial data processing. This approach enables spatial queries, coordinate transformations, and geometry operations directly in the database.
+PostGIS extension for PostgreSQL. Store geometry data, perform spatial queries, calculate distances in the database.
 
 ## The Problem
 
-When working with location data, you need to store coordinates and perform spatial operations. The typical approaches involve storing lat/lng as separate columns and calculating distances in application code, which is inefficient and doesn't leverage database capabilities.
+Separate lat/lng columns don't support spatial queries or efficient indexing.
 
 ```sql
 -- Basic approach - no spatial capabilities
@@ -20,34 +22,18 @@ CREATE TABLE locations (
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION
 );
-
--- Distance calculation in application code
--- const distance = calculateDistance(lat1, lng1, lat2, lng2);
 ```
-
-This works, but doesn't support spatial queries, coordinate systems, or efficient spatial indexing.
 
 ## The Solution
 
-Instead of separate lat/lng columns, we use PostGIS geometry types and spatial functions. The architecture flows from PostGIS-enabled database through geometry storage to spatial queries.
+Use PostGIS geometry types and spatial functions.
 
-### Architecture Overview
-
-PostGIS Extension → Geometry Columns → Spatial Indexes → Spatial Queries
-
-- **PostGIS extension**: Enables spatial capabilities
-- **Geometry columns**: Store spatial data (POINT, POLYGON, etc.)
-- **Spatial indexes**: GIST indexes for fast spatial queries
-- **Spatial queries**: Distance, intersection, containment operations
-
-### Implementation
-
-**Docker setup with PostGIS:**
+**Docker setup:**
 ```yaml
 # docker-compose.yml
 services:
   db:
-    image: postgis/postgis:15-3.3  # PostGIS-enabled image
+    image: postgis/postgis:15-3.3
     container_name: postgres_dev_db
     environment:
       POSTGRES_USER: postgres
@@ -59,12 +45,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
 ```
 
-**Enable PostGIS in database:**
+**Enable PostGIS:**
 ```sql
--- Enable PostGIS extension
+-- Enable extension
 CREATE EXTENSION IF NOT EXISTS postgis;
 
--- Verify installation
+-- Verify
 SELECT PostGIS_version();
 ```
 
@@ -73,10 +59,10 @@ SELECT PostGIS_version();
 CREATE TABLE locations (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
-    coordinates GEOMETRY(POINT, 4326)  -- WGS84 coordinate system
+    coordinates GEOMETRY(POINT, 4326)  -- WGS84
 );
 
--- Create spatial index
+-- Spatial index
 CREATE INDEX idx_locations_coordinates ON locations USING GIST (coordinates);
 ```
 
@@ -88,9 +74,9 @@ INSERT INTO locations (name, coordinates) VALUES
     ('Los Angeles', ST_SetSRID(ST_MakePoint(-118.2437, 34.0522), 4326));
 ```
 
-**Basic spatial queries:**
+**Spatial queries:**
 ```sql
--- Find points within radius
+-- Points within radius
 SELECT name, ST_AsText(coordinates) as location
 FROM locations
 WHERE ST_DWithin(
@@ -99,33 +85,34 @@ WHERE ST_DWithin(
     100000  -- 100km in meters
 );
 
--- Calculate distance between points
+-- Distance between points
 SELECT 
     a.name as location1,
     b.name as location2,
     ST_Distance(a.coordinates, b.coordinates) / 1000 as distance_km
 FROM locations a, locations b
 WHERE a.id < b.id;
+
+-- Convert to GeoJSON
+SELECT 
+    name,
+    ST_AsGeoJSON(coordinates) as geojson
+FROM locations;
 ```
 
-### PostGIS Functions
-
-- **ST_MakePoint(lng, lat)** - Create a point geometry
-- **ST_SetSRID(geom, srid)** - Set coordinate system
-- **ST_Distance(geom1, geom2)** - Calculate distance
-- **ST_DWithin(geom1, geom2, distance)** - Check if within distance
-- **ST_AsText(geom)** - Convert geometry to text
-- **ST_AsGeoJSON(geom)** - Convert to GeoJSON
+**PostGIS functions:**
+- `ST_MakePoint(lng, lat)` - Create point
+- `ST_SetSRID(geom, srid)` - Set coordinate system
+- `ST_Distance(geom1, geom2)` - Calculate distance
+- `ST_DWithin(geom1, geom2, distance)` - Within distance check
+- `ST_AsText(geom)` - Convert to text
+- `ST_AsGeoJSON(geom)` - Convert to GeoJSON
 
 ## Benefits
 
-This approach provides powerful spatial capabilities directly in the database. We get efficient spatial queries, coordinate system handling, and geometry operations without application code. This pattern works well for:
+- Performance - Spatial indexes for fast queries
+- Functionality - Rich spatial operations
+- Standards - Standard coordinate systems
+- Efficiency - Database handles calculations
 
-- **Performance** - Spatial indexes enable fast queries
-- **Functionality** - Rich set of spatial operations
-- **Standards** - Supports standard coordinate systems
-- **Efficiency** - Database handles spatial calculations
-
-The clean separation between spatial data storage and queries means geospatial operations are efficient and maintainable.
-
-This builds on Docker setup (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)). Next, see how to build GeoJSON APIs with PostGIS (see [building-geojson-apis.md](./building-geojson-apis.md)).
+Next: [building-geojson-apis.md](./building-geojson-apis.md)

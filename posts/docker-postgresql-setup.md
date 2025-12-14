@@ -4,37 +4,27 @@
 
 # Setting Up Docker for Local PostgreSQL Development
 
+![Docker PostgreSQL Setup](./images/docker-postgresql-setup.png)
+
 ## Introduction
 
-Set up a Docker-based PostgreSQL development environment for local API development. This approach keeps the database containerized and isolated from system PostgreSQL installations, making it easy to start, stop, and reset without affecting your system.
+Docker-based PostgreSQL setup for local development. Isolated, easy to reset, consistent across teams.
 
 ## The Problem
 
-When developing locally, you need a PostgreSQL database that matches production but doesn't interfere with system databases. The typical approaches involve installing PostgreSQL directly on your machine or manually managing database instances, which can conflict with existing installations and make cleanup difficult.
+Installing PostgreSQL directly conflicts with system installations and makes cleanup difficult.
 
 ```bash
-# Manual approach - can conflict with system PostgreSQL
+# Manual approach - conflicts with system PostgreSQL
 brew install postgresql
 initdb /usr/local/var/postgres
 pg_ctl start
 createdb your_database
 ```
 
-This works, but ties database setup to your local machine and makes it harder to share consistent environments across the team.
-
 ## The Solution
 
-Instead of installing PostgreSQL directly, we containerized the database using Docker Compose. The architecture flows from docker-compose configuration to a running PostgreSQL container accessible on localhost.
-
-### Architecture Overview
-
-docker-compose.yml → PostgreSQL Container → localhost:5432
-
-- **docker-compose.yml**: Defines the database service configuration
-- **PostgreSQL container**: Isolated database instance
-- **Port mapping**: Database accessible on localhost:5432
-
-### Implementation
+Use Docker Compose to run PostgreSQL in a container.
 
 ```yaml
 # docker-compose.yml
@@ -55,35 +45,41 @@ volumes:
   postgres_data:
 ```
 
-**Note**: For specialized extensions, use alternative images like `postgis/postgis:15-3.3` for geospatial data, `timescale/timescaledb` for time-series data, or other PostgreSQL variants as needed. The standard `postgres` image works for most use cases.
+**Specialized images:**
+- `postgis/postgis:15-3.3` - Geospatial data
+- `ankane/pgvector:latest` - Vector embeddings
+- `timescale/timescaledb` - Time-series data
 
-### Starting the Database
-
+**Commands:**
 ```bash
-# Start database container
+# Start
 docker-compose up -d
 
-# Verify it's running
+# Check status
 docker ps | grep postgres_dev_db
 
 # View logs
 docker-compose logs -f db
 
-# Stop database
+# Stop
 docker-compose down
+
+# Reset (removes data)
+docker-compose down -v && docker-compose up -d
 ```
 
-The database is now accessible at `localhost:5432` with username `postgres` and password `postgres`.
+**Connection:**
+- Host: `localhost`
+- Port: `5432`
+- User: `postgres`
+- Password: `postgres`
+- Database: `your_database`
 
 ## Benefits
 
-This approach provides isolated database environments that are easy to reset and share. We get consistent PostgreSQL instances without system-level conflicts. This pattern works well for:
+- Team consistency - Same setup everywhere
+- Easy cleanup - Reset with one command
+- No system conflicts - Isolated container
+- Quick setup - One command to start
 
-- **Team consistency** - Everyone runs the same database setup
-- **Easy cleanup** - Reset with one command when things go wrong
-- **No system conflicts** - Containerized database doesn't interfere with system PostgreSQL
-- **Quick setup** - One command to get a running database
-
-The clean separation between container configuration and your application means database setup is version-controlled and reproducible while maintaining full PostgreSQL capabilities.
-
-Once your database is running, you can set up initialization scripts (see [database-initialization-scripts.md](./database-initialization-scripts.md)) to automatically load schema and data, or configure data persistence (see [docker-data-persistence.md](./docker-data-persistence.md)). Then connect your Next.js application (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)).
+Next: [database-initialization-scripts.md](./database-initialization-scripts.md) | [docker-data-persistence.md](./docker-data-persistence.md) | [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)

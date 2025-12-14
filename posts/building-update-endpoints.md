@@ -6,34 +6,20 @@
 
 ## Introduction
 
-Built update endpoints in Next.js that modify existing records in PostgreSQL safely. This approach uses parameterized queries with partial updates, handling both PUT (full replacement) and PATCH (partial update) patterns.
+Update endpoints with dynamic query building. Supports partial updates (PATCH) and full replacement (PUT).
 
 ## The Problem
 
-When building update endpoints, you need to modify existing records safely. The typical approaches involve updating all fields even when only one changed, or using string concatenation, which leads to unnecessary updates and SQL injection vulnerabilities.
+Updating all fields even when only one changed is inefficient. String concatenation is unsafe.
 
 ```typescript
-// Inefficient approach - updates all fields
+// Inefficient - updates all fields
 const sql = `UPDATE users SET email='${email}', name='${name}', role='${role}' WHERE id=${id}`;
 ```
 
-This works, but updates all fields even when only one changed and is vulnerable to SQL injection.
-
 ## The Solution
 
-Instead of updating everything, we use dynamic query building with parameterized queries that only update provided fields. The architecture flows from request body through field detection to conditional updates.
-
-### Architecture Overview
-
-Request Body → Field Detection → Dynamic Update Query → Database → Updated Record
-
-- **Request body**: JSON with fields to update
-- **Field detection**: Identify which fields are provided
-- **Dynamic update**: Build query with only provided fields
-- **Database update**: Execute with parameters
-- **Updated record**: Return updated data
-
-### Implementation
+Build dynamic queries that only update provided fields.
 
 **PATCH - Partial updates:**
 ```typescript
@@ -48,7 +34,6 @@ export default async function handler(req, res) {
   const { id } = req.query;
   const { email, name, active } = req.body;
   
-  // Build dynamic update query
   const updates: string[] = [];
   const params: any[] = [];
   let paramCount = 0;
@@ -121,7 +106,7 @@ const result = await query(
 );
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/users/[id]/route.ts
 import { query } from '@/lib/db';
@@ -173,24 +158,19 @@ export async function PATCH(
 }
 ```
 
-### Best Practices
-
-- **PATCH for partial updates** - Only update provided fields
-- **PUT for full replacement** - Require all fields
-- **Use parameterized queries** - Prevents SQL injection
-- **Handle not found** - Return 404 for missing records
-- **Update timestamps** - Set updated_at automatically
-- **Return updated record** - Use RETURNING clause
+**Best practices:**
+- PATCH for partial updates (only provided fields)
+- PUT for full replacement (require all fields)
+- Use parameterized queries
+- Return 404 for missing records
+- Update `updated_at` automatically
+- Use `RETURNING *` to return updated record
 
 ## Benefits
 
-This approach provides flexible update endpoints that handle both partial and full updates safely. We get SQL injection protection, efficient updates, and proper HTTP status codes. This pattern works well for:
+- Flexibility - Support both PATCH and PUT
+- Efficiency - Only update fields that changed
+- Security - Parameterized queries prevent SQL injection
+- User experience - Clear error messages
 
-- **Flexibility** - Support both PATCH and PUT patterns
-- **Efficiency** - Only update fields that changed
-- **Security** - Parameterized queries prevent SQL injection
-- **User experience** - Clear error messages for conflicts
-
-The clean separation between request handling and database operations means update endpoints are secure and maintainable while supporting flexible update patterns.
-
-This builds on POST endpoints (see [building-post-endpoints.md](./building-post-endpoints.md)). Next, see how to delete data with DELETE endpoints (see [building-delete-endpoints.md](./building-delete-endpoints.md)).
+Next: [building-delete-endpoints.md](./building-delete-endpoints.md)

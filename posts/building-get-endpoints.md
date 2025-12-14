@@ -6,52 +6,44 @@
 
 ## Introduction
 
-Built GET endpoints in Next.js that retrieve data from PostgreSQL efficiently. This approach uses parameterized queries and proper response formatting to create safe, performant read operations.
+GET endpoints with parameterized queries. Safe, efficient, handles filtering and errors.
 
 ## The Problem
 
-When building GET endpoints, you need to retrieve data from the database safely and efficiently. The typical approaches involve string concatenation for queries or fetching all data without filtering, which leads to SQL injection vulnerabilities and performance issues.
+String concatenation in queries leads to SQL injection.
 
 ```typescript
-// Unsafe approach - SQL injection risk
+// Unsafe - SQL injection risk
 const result = await query(`SELECT * FROM users WHERE id = ${req.query.id}`);
 ```
 
-This works for simple cases, but is vulnerable to SQL injection and doesn't scale to complex queries.
-
 ## The Solution
 
-Instead of string concatenation, we use parameterized queries with proper filtering and response formatting. The architecture flows from request parameters through parameterized queries to formatted responses.
+Use parameterized queries with proper error handling.
 
-### Architecture Overview
-
-Request Parameters → Parameterized Query → Database → Formatted Response
-
-- **Request parameters**: Query string or route parameters
-- **Parameterized queries**: Safe SQL with placeholders
-- **Database query**: Executes with parameters
-- **Formatted response**: JSON response with data
-
-### Implementation
-
-**Single record by ID:**
+**Single record:**
 ```typescript
 // pages/api/users/[id].ts
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  const { id } = req.query;
-  
-  const result = await query(
-    'SELECT * FROM users WHERE id = $1',
-    [id]
-  );
-  
-  if (result.rows.length === 0) {
-    return res.status(404).json({ error: 'User not found' });
+  try {
+    const { id } = req.query;
+    
+    const result = await query(
+      'SELECT id, email, name FROM users WHERE id = $1',
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
-  
-  res.json(result.rows[0]);
 }
 ```
 
@@ -61,30 +53,43 @@ export default async function handler(req, res) {
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  const { active, role } = req.query;
-  
-  let sql = 'SELECT * FROM users WHERE 1=1';
-  const params: any[] = [];
-  let paramCount = 0;
-  
-  if (active !== undefined) {
-    paramCount++;
-    sql += ` AND active = $${paramCount}`;
-    params.push(active === 'true');
+  try {
+    const { active, role, search } = req.query;
+    
+    let sql = 'SELECT id, email, name FROM users WHERE 1=1';
+    const params: any[] = [];
+    let paramCount = 0;
+    
+    if (active !== undefined) {
+      paramCount++;
+      sql += ` AND active = $${paramCount}`;
+      params.push(active === 'true');
+    }
+    
+    if (role) {
+      paramCount++;
+      sql += ` AND role = $${paramCount}`;
+      params.push(role);
+    }
+    
+    if (search) {
+      paramCount++;
+      sql += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
+      params.push(`%${search}%`);
+    }
+    
+    sql += ' ORDER BY created_at DESC LIMIT 50';
+    
+    const result = await query(sql, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
-  
-  if (role) {
-    paramCount++;
-    sql += ` AND role = $${paramCount}`;
-    params.push(role);
-  }
-  
-  const result = await query(sql, params);
-  res.json(result.rows);
 }
 ```
 
-**App Router example:**
+**App Router:**
 ```typescript
 // app/api/users/[id]/route.ts
 import { query } from '@/lib/db';
@@ -94,39 +99,41 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const result = await query(
-    'SELECT * FROM users WHERE id = $1',
-    [params.id]
-  );
-  
-  if (result.rows.length === 0) {
+  try {
+    const result = await query(
+      'SELECT id, email, name FROM users WHERE id = $1',
+      [params.id]
+    );
+    
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
     return NextResponse.json(
-      { error: 'User not found' },
-      { status: 404 }
+      { error: 'Failed to fetch user' },
+      { status: 500 }
     );
   }
-  
-  return NextResponse.json(result.rows[0]);
 }
 ```
 
-### Best Practices
-
-- **Always use parameterized queries** - Prevents SQL injection
-- **Validate input** - Check parameter types and ranges
-- **Handle not found** - Return 404 for missing resources
-- **Limit results** - Use LIMIT to prevent large responses
-- **Select specific columns** - Don't use SELECT * in production
+**Best practices:**
+- Always use parameterized queries (`$1`, `$2`, etc.)
+- Validate input types and ranges
+- Return 404 for missing resources
+- Use LIMIT to prevent large responses
+- Select specific columns, not `SELECT *`
 
 ## Benefits
 
-This approach provides safe, efficient GET endpoints that handle filtering and error cases properly. We get SQL injection protection, proper HTTP status codes, and clean response formatting. This pattern works well for:
+- Security - Prevents SQL injection
+- Performance - Efficient queries
+- Consistency - Standard patterns
+- Maintainability - Clear code
 
-- **Security** - Parameterized queries prevent SQL injection
-- **Performance** - Efficient queries with proper filtering
-- **Consistency** - Standard patterns across endpoints
-- **Maintainability** - Clear, readable query construction
-
-The clean separation between request handling and database queries means endpoints are secure and performant while maintaining readable code.
-
-This builds on API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)). Next, see how to create data with POST endpoints (see [building-post-endpoints.md](./building-post-endpoints.md)).
+Next: [building-post-endpoints.md](./building-post-endpoints.md)
