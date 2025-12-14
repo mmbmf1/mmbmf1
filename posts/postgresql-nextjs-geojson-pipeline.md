@@ -1,63 +1,35 @@
 <!--
-#postgis #nextjs #geojson #database #api #geospatial #postgresql #typescript #performance #spatial #mapping #webapi #databasefunctions #fullstack #modernweb #spatialdata #geoutils
+#postgis #nextjs #geojson #database #api #geospatial #postgresql #typescript
 -->
 
 # Building a Production-Ready GeoJSON Pipeline with PostGIS + Next.js
 
 ## Introduction
 
-Built a geospatial data pipeline using PostgreSQL's PostGIS extension with Next.js API routes to generate GeoJSON from coordinate data. This approach uses database-level spatial processing instead of JavaScript calculations. This builds on the database connection setup (see [nextjs-api-routes.md](./nextjs-api-routes.md)) and requires PostGIS-enabled PostgreSQL (see [postgis-setup-basics.md](./postgis-setup-basics.md) for PostGIS setup).
+Geospatial data pipeline using PostGIS with Next.js API routes. Database-level spatial processing, not JavaScript calculations.
 
 ## The Problem
 
-When building mapping applications, you need to convert coordinate data into GeoJSON format. The typical approach processes this data in JavaScript, which works for small datasets but becomes inefficient as you scale to thousands of points.
+Processing coordinates in JavaScript is slow for large datasets.
 
 ```javascript
-// JavaScript approach - inefficient for large datasets
 const features = data.map(point => ({
   type: "Feature",
-  geometry: {
-    type: "Point", 
-    coordinates: [point.lng, point.lat]
-  },
+  geometry: { type: "Point", coordinates: [point.lng, point.lat] },
   properties: { name: point.name }
 }));
 ```
 
-This works, but doesn't use the spatial processing capabilities that databases provide.
-
 ## The Solution
 
-Instead of processing data in JavaScript, we built custom PostGIS database functions that handle the spatial operations at the database level. The architecture flows from coordinate data through Next.js API routes to PostGIS functions, producing standardized GeoJSON responses.
+Use PostGIS database functions to generate GeoJSON at the database level.
 
-### API Design
-
+**API endpoint:**
 ```typescript
-// Clean, type-safe API endpoints
-POST /api/geojson/points
-{
-  "data": [
-    {"name": "NYC", "lat": 40.7128, "lng": -74.006, "population": 8336817}
-  ],
-  "latField": "lat",
-  "lngField": "lng", 
-  "properties": ["name", "population"]
-}
-
-// Returns GeoJSON FeatureCollection
-{
-  "type": "FeatureCollection",
-  "features": [...]
-}
-```
-
-### Implementation
-
-```typescript
-// Next.js API route - uses the database connection from nextjs-postgresql-connection.md
+// pages/api/geojson/points.ts
 import { query } from '@/lib/db';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
   const { data, latField, lngField, properties } = req.body;
   
   const result = await query(`
@@ -68,12 +40,76 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 ```
 
+**Database function:**
+```sql
+CREATE OR REPLACE FUNCTION generate_geojson_points(
+    data_json JSONB,
+    lat_field TEXT,
+    lng_field TEXT,
+    properties TEXT[]
+) RETURNS JSONB AS $$
+DECLARE
+    features JSONB := '[]'::JSONB;
+    item JSONB;
+    point GEOMETRY;
+BEGIN
+    FOR item IN SELECT * FROM jsonb_array_elements(data_json)
+    LOOP
+        point := ST_SetSRID(
+            ST_MakePoint(
+                (item->>lng_field)::DOUBLE PRECISION,
+                (item->>lat_field)::DOUBLE PRECISION
+            ),
+            4326
+        );
+        
+        features := features || jsonb_build_array(
+            jsonb_build_object(
+                'type', 'Feature',
+                'geometry', ST_AsGeoJSON(point)::JSONB,
+                'properties', (
+                    SELECT jsonb_object_agg(key, value)
+                    FROM jsonb_each(item)
+                    WHERE key = ANY(properties)
+                )
+            )
+        );
+    END LOOP;
+    
+    RETURN jsonb_build_object('type', 'FeatureCollection', 'features', features);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+**Query existing PostGIS data:**
+```typescript
+// pages/api/locations/geojson.ts
+import { query } from '@/lib/db';
+
+export default async function handler(req, res) {
+  const result = await query(`
+    SELECT jsonb_build_object(
+      'type', 'FeatureCollection',
+      'features', jsonb_agg(
+        jsonb_build_object(
+          'type', 'Feature',
+          'geometry', ST_AsGeoJSON(coordinates)::JSONB,
+          'properties', jsonb_build_object('id', id, 'name', name)
+        )
+      )
+    ) as geojson
+    FROM locations
+  `);
+  
+  res.json(result.rows[0].geojson);
+}
+```
+
 ## Benefits
 
-This approach uses PostGIS spatial indexes and geodetic calculations. We get coordinate system handling and geometry validation without additional code. This pattern works well for:
+- Mapping applications - Real-time geospatial data processing
+- Data visualization - Efficient coordinate transformations
+- Performance - Database handles spatial operations
+- Standards - GeoJSON is widely supported
 
-- **Mapping applications** - Real-time geospatial data processing
-- **Data visualization projects** - Efficient coordinate transformations  
-- **Real-time applications** - Processing location data streams
-
-The clean separation between the API layer and database processing means the heavy lifting happens in PostGIS while Next.js handles the HTTP interface. This pattern combines efficient database connections (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)) with specialized PostgreSQL extensions for domain-specific processing.
+This builds on [nextjs-api-routes.md](./nextjs-api-routes.md) and [postgis-setup-basics.md](./postgis-setup-basics.md). See [building-geojson-apis.md](./building-geojson-apis.md) for more examples.

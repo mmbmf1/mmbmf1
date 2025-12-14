@@ -15,7 +15,6 @@ Docker-based PostgreSQL setup for local development. Isolated, easy to reset, co
 Installing PostgreSQL directly conflicts with system installations and makes cleanup difficult.
 
 ```bash
-# Manual approach - conflicts with system PostgreSQL
 brew install postgresql
 initdb /usr/local/var/postgres
 pg_ctl start
@@ -52,19 +51,10 @@ volumes:
 
 **Commands:**
 ```bash
-# Start
 docker-compose up -d
-
-# Check status
 docker ps | grep postgres_dev_db
-
-# View logs
 docker-compose logs -f db
-
-# Stop
 docker-compose down
-
-# Reset (removes data)
 docker-compose down -v && docker-compose up -d
 ```
 

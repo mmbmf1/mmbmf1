@@ -15,7 +15,6 @@ PostGIS extension for PostgreSQL. Store geometry data, perform spatial queries, 
 Separate lat/lng columns don't support spatial queries or efficient indexing.
 
 ```sql
--- Basic approach - no spatial capabilities
 CREATE TABLE locations (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
@@ -47,10 +46,7 @@ services:
 
 **Enable PostGIS:**
 ```sql
--- Enable extension
 CREATE EXTENSION IF NOT EXISTS postgis;
-
--- Verify
 SELECT PostGIS_version();
 ```
 
@@ -59,16 +55,14 @@ SELECT PostGIS_version();
 CREATE TABLE locations (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
-    coordinates GEOMETRY(POINT, 4326)  -- WGS84
+    coordinates GEOMETRY(POINT, 4326)
 );
 
--- Spatial index
 CREATE INDEX idx_locations_coordinates ON locations USING GIST (coordinates);
 ```
 
 **Insert spatial data:**
 ```sql
--- Insert point (longitude, latitude)
 INSERT INTO locations (name, coordinates) VALUES
     ('New York', ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326)),
     ('Los Angeles', ST_SetSRID(ST_MakePoint(-118.2437, 34.0522), 4326));
@@ -79,25 +73,15 @@ INSERT INTO locations (name, coordinates) VALUES
 -- Points within radius
 SELECT name, ST_AsText(coordinates) as location
 FROM locations
-WHERE ST_DWithin(
-    coordinates,
-    ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326),
-    100000  -- 100km in meters
-);
+WHERE ST_DWithin(coordinates, ST_SetSRID(ST_MakePoint(-74.006, 40.7128), 4326), 100000);
 
 -- Distance between points
-SELECT 
-    a.name as location1,
-    b.name as location2,
-    ST_Distance(a.coordinates, b.coordinates) / 1000 as distance_km
+SELECT a.name, b.name, ST_Distance(a.coordinates, b.coordinates) / 1000 as distance_km
 FROM locations a, locations b
 WHERE a.id < b.id;
 
 -- Convert to GeoJSON
-SELECT 
-    name,
-    ST_AsGeoJSON(coordinates) as geojson
-FROM locations;
+SELECT name, ST_AsGeoJSON(coordinates) as geojson FROM locations;
 ```
 
 **PostGIS functions:**
@@ -105,7 +89,6 @@ FROM locations;
 - `ST_SetSRID(geom, srid)` - Set coordinate system
 - `ST_Distance(geom1, geom2)` - Calculate distance
 - `ST_DWithin(geom1, geom2, distance)` - Within distance check
-- `ST_AsText(geom)` - Convert to text
 - `ST_AsGeoJSON(geom)` - Convert to GeoJSON
 
 ## Benefits

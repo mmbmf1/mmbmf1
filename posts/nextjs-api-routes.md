@@ -13,11 +13,9 @@ Use the shared database connection pool in Next.js API routes. Clean database ac
 Managing connections in every route leads to duplication and inconsistent patterns.
 
 ```typescript
-// Inconsistent - connection logic in every route
 export default async function handler(req, res) {
   const pool = new Pool({ /* config */ });
   const result = await pool.query('SELECT * FROM users');
-  // ...
 }
 ```
 
@@ -31,13 +29,8 @@ Import the shared database client and use it directly.
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  try {
-    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database query failed' });
-  }
+  const result = await query('SELECT * FROM users WHERE active = $1', [true]);
+  res.json(result.rows);
 }
 ```
 
@@ -48,16 +41,8 @@ import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  try {
-    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
-    return NextResponse.json(result.rows);
-  } catch (error) {
-    console.error('Database error:', error);
-    return NextResponse.json(
-      { error: 'Database query failed' },
-      { status: 500 }
-    );
-  }
+  const result = await query('SELECT * FROM users WHERE active = $1', [true]);
+  return NextResponse.json(result.rows);
 }
 ```
 
@@ -72,29 +57,19 @@ DB=your_database
 
 **Query with parameters:**
 ```typescript
-// Dynamic queries
 const { id, active } = req.query;
-
-const result = await query(
-  'SELECT * FROM users WHERE id = $1 AND active = $2',
-  [id, active === 'true']
-);
+const result = await query('SELECT * FROM users WHERE id = $1 AND active = $2', [id, active === 'true']);
 ```
 
-**Multiple queries:**
+**Parallel queries:**
 ```typescript
-// Sequential queries
-const userResult = await query('SELECT * FROM users WHERE id = $1', [id]);
-const postsResult = await query('SELECT * FROM posts WHERE user_id = $1', [id]);
-
-// Parallel queries
 const [userResult, postsResult] = await Promise.all([
   query('SELECT * FROM users WHERE id = $1', [id]),
   query('SELECT * FROM posts WHERE user_id = $1', [id])
 ]);
 ```
 
-**Transaction example:**
+**Transaction:**
 ```typescript
 import pool from '@/lib/db';
 

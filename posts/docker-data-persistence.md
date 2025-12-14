@@ -13,7 +13,6 @@ Docker volumes keep PostgreSQL data separate from containers. Data survives rest
 Container data is lost when containers stop or are removed.
 
 ```bash
-# Data lost when container stops
 docker-compose down
 docker-compose up -d
 # All data gone
@@ -37,18 +36,12 @@ volumes:
 
 **Data lifecycle:**
 ```bash
-# Data persists through restarts
+# Data persists
 docker-compose down
 docker-compose up -d
 # Data still there
 
-# Data persists through container removal
-docker-compose down
-docker-compose rm db
-docker-compose up -d
-# Data still there
-
-# Delete data (removes volumes)
+# Delete data
 docker-compose down -v
 docker-compose up -d
 # Fresh database, initialization scripts run again
@@ -56,32 +49,16 @@ docker-compose up -d
 
 **Volume management:**
 ```bash
-# List volumes
 docker volume ls
-
-# Inspect volume
 docker volume inspect posts_postgres_data
-
-# Remove specific volume
 docker volume rm posts_postgres_data
-
-# Remove all unused volumes
 docker volume prune
 ```
 
-**Volume location:**
-- Linux: `/var/lib/docker/volumes/`
-- macOS/Windows: Managed by Docker Desktop
-
 **Backup volume:**
 ```bash
-# Backup
 docker run --rm -v posts_postgres_data:/data -v $(pwd):/backup \
   alpine tar czf /backup/postgres_backup.tar.gz /data
-
-# Restore
-docker run --rm -v posts_postgres_data:/data -v $(pwd):/backup \
-  alpine tar xzf /backup/postgres_backup.tar.gz -C /
 ```
 
 ## Benefits

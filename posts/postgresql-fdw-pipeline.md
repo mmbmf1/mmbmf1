@@ -13,7 +13,6 @@ Sync data between PostgreSQL databases using Foreign Data Wrappers. Direct cross
 Manual exports and imports don't provide real-time access and are hard to maintain.
 
 ```sql
--- Manual approach - inefficient
 COPY (SELECT * FROM source_table) TO '/tmp/export.csv';
 COPY target_table FROM '/tmp/export.csv';
 ```
@@ -24,20 +23,16 @@ Use Foreign Data Wrappers to query remote databases directly.
 
 **Setup:**
 ```sql
--- Enable extension
 CREATE EXTENSION IF NOT EXISTS postgres_fdw;
 
--- Create foreign server
 CREATE SERVER source_server
 FOREIGN DATA WRAPPER postgres_fdw
 OPTIONS (host 'source-host', port '5432', dbname 'source_database');
 
--- Create user mapping
 CREATE USER MAPPING FOR CURRENT_USER
 SERVER source_server
 OPTIONS (user 'source_user', password 'source_password');
 
--- Create foreign table
 CREATE FOREIGN TABLE source_properties (
     id INT,
     property_id VARCHAR,
@@ -50,24 +45,21 @@ OPTIONS (schema_name 'data', table_name 'properties');
 
 **Query foreign table:**
 ```sql
--- Direct query
 SELECT * FROM source_properties WHERE latitude > 40;
 
--- Join with local tables
-SELECT 
-    l.name,
-    f.property_id
+SELECT l.name, f.property_id
 FROM local_locations l
 JOIN source_properties f ON ST_DWithin(l.coords, f.coords, 1000);
 ```
 
 **Sync data:**
 ```sql
--- Basic sync
 TRUNCATE TABLE data.properties;
 INSERT INTO data.properties SELECT * FROM source_properties;
+```
 
--- Batch sync for large datasets
+**Batch sync:**
+```sql
 DO $$
 DECLARE
     batch_size INTEGER := 5000;
@@ -87,24 +79,10 @@ BEGIN
 END $$;
 ```
 
-**Update foreign table:**
-```sql
--- Refresh foreign table definition
-DROP FOREIGN TABLE source_properties;
-CREATE FOREIGN TABLE source_properties (...)
-SERVER source_server
-OPTIONS (schema_name 'data', table_name 'properties');
-```
-
 **Cleanup:**
 ```sql
--- Drop foreign table
 DROP FOREIGN TABLE source_properties;
-
--- Drop user mapping
 DROP USER MAPPING FOR CURRENT_USER SERVER source_server;
-
--- Drop server
 DROP SERVER source_server;
 ```
 

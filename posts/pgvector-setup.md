@@ -15,11 +15,10 @@ pgvector extension for PostgreSQL. Store and query vector embeddings. Semantic s
 Storing embeddings as JSON arrays doesn't support efficient similarity search.
 
 ```sql
--- Basic approach - no vector capabilities
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
     content TEXT,
-    embedding JSONB  -- Can't query efficiently
+    embedding JSONB
 );
 ```
 
@@ -46,10 +45,7 @@ services:
 
 **Enable extension:**
 ```sql
--- Enable pgvector
 CREATE EXTENSION IF NOT EXISTS vector;
-
--- Verify
 SELECT * FROM pg_extension WHERE extname = 'vector';
 ```
 
@@ -58,31 +54,21 @@ SELECT * FROM pg_extension WHERE extname = 'vector';
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
     content TEXT,
-    embedding vector(1536)  -- OpenAI ada-002 dimension
+    embedding vector(1536)
 );
 
--- HNSW index for fast similarity search
-CREATE INDEX ON documents 
-USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops);
 ```
 
 **Insert vector data:**
 ```sql
--- Insert document with embedding
 INSERT INTO documents (content, embedding) VALUES
-    (
-        'PostgreSQL is a powerful database',
-        '[0.1, 0.2, 0.3, ...]'::vector
-    );
+    ('PostgreSQL is a powerful database', '[0.1, 0.2, 0.3, ...]'::vector);
 ```
 
 **Similarity search:**
 ```sql
--- Find similar documents using cosine similarity
-SELECT 
-    id,
-    content,
-    1 - (embedding <=> '[0.1, 0.2, 0.3, ...]'::vector) as similarity
+SELECT id, content, 1 - (embedding <=> '[0.1, 0.2, 0.3, ...]'::vector) as similarity
 FROM documents
 ORDER BY embedding <=> '[0.1, 0.2, 0.3, ...]'::vector
 LIMIT 5;
@@ -95,12 +81,11 @@ LIMIT 5;
 
 **Index types:**
 ```sql
--- HNSW index (recommended for large datasets)
+-- HNSW index (recommended)
 CREATE INDEX ON documents USING hnsw (embedding vector_cosine_ops);
 
--- IVFFlat index (faster to build, slower queries)
-CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops) 
-WITH (lists = 100);
+-- IVFFlat index (faster to build)
+CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 ```
 
 ## Benefits

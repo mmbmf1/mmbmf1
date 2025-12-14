@@ -13,7 +13,6 @@ Auto-run SQL scripts on first container start. Consistent schema and seed data w
 Manual script execution is error-prone and doesn't scale.
 
 ```bash
-# Manual approach
 docker-compose up -d
 psql -h localhost -U postgres -d your_database -f schema.sql
 psql -h localhost -U postgres -d your_database -f seed_data.sql
@@ -66,19 +65,6 @@ INSERT INTO app.users (email, name) VALUES
 - Files execute in alphabetical order (number them)
 - To reinitialize: `docker-compose down -v && docker-compose up -d`
 - Scripts run in the `POSTGRES_DB` database context
-
-**Multiple databases:**
-```sql
--- Connect to postgres database first
-\c postgres
-
-CREATE DATABASE your_database;
-CREATE DATABASE test_database;
-
--- Then connect and create schema
-\c your_database
-CREATE SCHEMA app;
-```
 
 ## Benefits
 

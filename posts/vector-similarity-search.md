@@ -13,7 +13,6 @@ Vector similarity search queries with pgvector. Find semantically similar conten
 Application-level similarity calculation is slow and doesn't scale.
 
 ```typescript
-// Inefficient - fetch all, calculate in JavaScript
 const queryEmbedding = await generateEmbedding(query);
 const allDocs = await query('SELECT id, content, embedding FROM documents');
 const similarities = allDocs.map(doc => ({
@@ -36,73 +35,43 @@ import { generateEmbedding } from '@/lib/embeddings';
 export default async function handler(req, res) {
   const { q, limit = 10 } = req.query;
   
-  if (!q) {
-    return res.status(400).json({ error: 'Query parameter q is required' });
-  }
+  const queryEmbedding = await generateEmbedding(q as string);
   
-  try {
-    const queryEmbedding = await generateEmbedding(q as string);
-    
-    const result = await query(
-      `SELECT 
-        id,
-        content,
-        1 - (embedding <=> $1::vector) as similarity
-      FROM documents
-      WHERE embedding IS NOT NULL
-      ORDER BY embedding <=> $1::vector
-      LIMIT $2`,
-      [JSON.stringify(queryEmbedding), parseInt(limit as string)]
-    );
-    
-    res.json({
-      query: q,
-      results: result.rows.map(row => ({
-        id: row.id,
-        content: row.content,
-        similarity: parseFloat(row.similarity)
-      }))
-    });
-  } catch (error) {
-    console.error('Search error:', error);
-    res.status(500).json({ error: 'Failed to perform search' });
-  }
+  const result = await query(
+    `SELECT id, content, 1 - (embedding <=> $1::vector) as similarity
+     FROM documents
+     WHERE embedding IS NOT NULL
+     ORDER BY embedding <=> $1::vector
+     LIMIT $2`,
+    [JSON.stringify(queryEmbedding), parseInt(limit as string)]
+  );
+  
+  res.json({ query: q, results: result.rows });
 }
 ```
 
 **Similarity threshold:**
 ```typescript
-// Only return results above threshold
 const result = await query(
-  `SELECT 
-    id,
-    content,
-    1 - (embedding <=> $1::vector) as similarity
-  FROM documents
-  WHERE embedding IS NOT NULL
-    AND (embedding <=> $1::vector) < $2  -- Cosine distance threshold
-  ORDER BY embedding <=> $1::vector
-  LIMIT $3`,
-  [JSON.stringify(queryEmbedding), 0.3, limit] // 0.3 distance = ~0.7 similarity
+  `SELECT id, content, 1 - (embedding <=> $1::vector) as similarity
+   FROM documents
+   WHERE embedding IS NOT NULL AND (embedding <=> $1::vector) < $2
+   ORDER BY embedding <=> $1::vector LIMIT $3`,
+  [JSON.stringify(queryEmbedding), 0.3, limit]
 );
 ```
 
 **Hybrid search (vector + keyword):**
 ```typescript
-// Combine semantic and keyword search
 const result = await query(
-  `SELECT 
-    id,
-    content,
+  `SELECT id, content,
     1 - (embedding <=> $1::vector) as similarity,
     ts_rank(to_tsvector('english', content), plainto_tsquery('english', $2)) as keyword_rank
-  FROM documents
-  WHERE embedding IS NOT NULL
-    AND content ILIKE $3
-  ORDER BY 
-    (1 - (embedding <=> $1::vector)) * 0.7 + 
-    ts_rank(to_tsvector('english', content), plainto_tsquery('english', $2)) * 0.3 DESC
-  LIMIT $4`,
+   FROM documents
+   WHERE embedding IS NOT NULL AND content ILIKE $3
+   ORDER BY (1 - (embedding <=> $1::vector)) * 0.7 + 
+            ts_rank(to_tsvector('english', content), plainto_tsquery('english', $2)) * 0.3 DESC
+   LIMIT $4`,
   [JSON.stringify(queryEmbedding), keywordQuery, `%${keywordQuery}%`, limit]
 );
 ```
@@ -119,30 +88,16 @@ export async function GET(request: Request) {
   const q = searchParams.get('q');
   const limit = parseInt(searchParams.get('limit') || '10');
   
-  if (!q) {
-    return NextResponse.json(
-      { error: 'Query parameter q is required' },
-      { status: 400 }
-    );
-  }
-  
-  const queryEmbedding = await generateEmbedding(q);
+  const queryEmbedding = await generateEmbedding(q!);
   
   const result = await query(
-    `SELECT 
-      id,
-      content,
-      1 - (embedding <=> $1::vector) as similarity
-    FROM documents
-    ORDER BY embedding <=> $1::vector
-    LIMIT $2`,
+    `SELECT id, content, 1 - (embedding <=> $1::vector) as similarity
+     FROM documents
+     ORDER BY embedding <=> $1::vector LIMIT $2`,
     [JSON.stringify(queryEmbedding), limit]
   );
   
-  return NextResponse.json({
-    query: q,
-    results: result.rows
-  });
+  return NextResponse.json({ query: q, results: result.rows });
 }
 ```
 

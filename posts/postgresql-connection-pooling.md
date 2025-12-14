@@ -15,7 +15,6 @@ Shared connection pool for PostgreSQL in Next.js. Reuses connections across requ
 Creating new connections per request hits limits and leaks connections.
 
 ```typescript
-// Bad - new connection every request
 const client = new Client({ /* config */ });
 await client.connect();
 const result = await client.query('SELECT * FROM users');
@@ -54,13 +53,8 @@ export default pool;
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  try {
-    const result = await query('SELECT * FROM users WHERE active = $1', [true]);
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database query failed' });
-  }
+  const result = await query('SELECT * FROM users WHERE active = $1', [true]);
+  res.json(result.rows);
 }
 ```
 

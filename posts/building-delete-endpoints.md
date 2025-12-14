@@ -13,7 +13,6 @@ DELETE endpoints with existence checks and constraint handling. Safe deletion wi
 Blind deletion doesn't verify records exist and ignores foreign key constraints.
 
 ```typescript
-// Problematic - no existence check
 const sql = `DELETE FROM users WHERE id = ${id}`;
 ```
 
@@ -27,34 +26,21 @@ Check existence first, handle constraints, use parameterized queries.
 import { query } from '@/lib/db';
 
 export default async function handler(req, res) {
-  if (req.method !== 'DELETE') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  
   const { id } = req.query;
   
+  const checkResult = await query('SELECT id FROM users WHERE id = $1', [id]);
+  
+  if (checkResult.rows.length === 0) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
   try {
-    // Check if record exists
-    const checkResult = await query(
-      'SELECT id FROM users WHERE id = $1',
-      [id]
-    );
-    
-    if (checkResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    // Delete the record
     await query('DELETE FROM users WHERE id = $1', [id]);
-    
     res.status(204).send();
   } catch (error: any) {
-    if (error.code === '23503') { // Foreign key violation
-      return res.status(409).json({ 
-        error: 'Cannot delete user with associated records' 
-      });
+    if (error.code === '23503') {
+      return res.status(409).json({ error: 'Cannot delete user with associated records' });
     }
-    console.error('Database error:', error);
     res.status(500).json({ error: 'Failed to delete user' });
   }
 }
@@ -62,11 +48,7 @@ export default async function handler(req, res) {
 
 **Delete with RETURNING:**
 ```typescript
-// Return deleted record
-const result = await query(
-  'DELETE FROM users WHERE id = $1 RETURNING *',
-  [id]
-);
+const result = await query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
 
 if (result.rows.length === 0) {
   return res.status(404).json({ error: 'User not found' });
@@ -77,12 +59,9 @@ res.json({ message: 'User deleted', user: result.rows[0] });
 
 **Soft delete:**
 ```typescript
-// Mark as deleted instead of removing
 const result = await query(
-  `UPDATE users 
-   SET deleted_at = NOW(), active = false 
-   WHERE id = $1 AND deleted_at IS NULL 
-   RETURNING *`,
+  `UPDATE users SET deleted_at = NOW(), active = false 
+   WHERE id = $1 AND deleted_at IS NULL RETURNING *`,
   [id]
 );
 
@@ -99,46 +78,23 @@ res.json({ message: 'User deleted', user: result.rows[0] });
 import { query } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const checkResult = await query('SELECT id FROM users WHERE id = $1', [params.id]);
+  
+  if (checkResult.rows.length === 0) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  }
+  
   try {
-    const checkResult = await query(
-      'SELECT id FROM users WHERE id = $1',
-      [params.id]
-    );
-    
-    if (checkResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-    
     await query('DELETE FROM users WHERE id = $1', [params.id]);
-    
     return new NextResponse(null, { status: 204 });
   } catch (error: any) {
     if (error.code === '23503') {
-      return NextResponse.json(
-        { error: 'Cannot delete user with associated records' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'Cannot delete user with associated records' }, { status: 409 });
     }
-    return NextResponse.json(
-      { error: 'Failed to delete user' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }
 }
-```
-
-**Cascade delete:**
-```typescript
-// Delete related records first
-await query('DELETE FROM posts WHERE user_id = $1', [id]);
-await query('DELETE FROM users WHERE id = $1', [id]);
 ```
 
 **Best practices:**
@@ -147,7 +103,6 @@ await query('DELETE FROM users WHERE id = $1', [id]);
 - Handle foreign key violations (code `23503`)
 - Consider soft deletes for audit trails
 - Return 204 for success, 404 for not found
-- Use `RETURNING *` if client needs confirmation
 
 ## Benefits
 

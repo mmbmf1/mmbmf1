@@ -13,7 +13,6 @@ Consistent error handling across API routes. Clear error responses, proper HTTP 
 Generic error messages expose database internals and provide poor user experience.
 
 ```typescript
-// Poor error handling - exposes internals
 try {
   const result = await query('SELECT * FROM users WHERE id = $1', [id]);
 } catch (error) {
@@ -29,11 +28,7 @@ Use error handling utilities with consistent error formats.
 ```typescript
 // lib/errors.ts
 export class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    public message: string,
-    public code?: string
-  ) {
+  constructor(public statusCode: number, public message: string, public code?: string) {
     super(message);
     this.name = 'ApiError';
   }
@@ -41,33 +36,11 @@ export class ApiError extends Error {
 
 export function handleDatabaseError(error: any): ApiError {
   switch (error.code) {
-    case '23505': // Unique violation
-      return new ApiError(409, 'Resource already exists', 'CONFLICT');
-    case '23503': // Foreign key violation
-      return new ApiError(409, 'Cannot delete: related records exist', 'CONSTRAINT_VIOLATION');
-    case '23502': // Not null violation
-      return new ApiError(400, 'Required field is missing', 'VALIDATION_ERROR');
-    case '42P01': // Table doesn't exist
-      return new ApiError(500, 'Database configuration error', 'DATABASE_ERROR');
-    default:
-      console.error('Database error:', error);
-      return new ApiError(500, 'Database operation failed', 'DATABASE_ERROR');
+    case '23505': return new ApiError(409, 'Resource already exists', 'CONFLICT');
+    case '23503': return new ApiError(409, 'Cannot delete: related records exist', 'CONSTRAINT_VIOLATION');
+    case '23502': return new ApiError(400, 'Required field is missing', 'VALIDATION_ERROR');
+    default: return new ApiError(500, 'Database operation failed', 'DATABASE_ERROR');
   }
-}
-
-export function sendErrorResponse(res: any, error: ApiError | Error) {
-  if (error instanceof ApiError) {
-    return res.status(error.statusCode).json({
-      error: error.message,
-      code: error.code
-    });
-  }
-  
-  console.error('Unexpected error:', error);
-  return res.status(500).json({
-    error: 'An unexpected error occurred',
-    code: 'INTERNAL_ERROR'
-  });
 }
 ```
 
@@ -75,49 +48,29 @@ export function sendErrorResponse(res: any, error: ApiError | Error) {
 ```typescript
 // pages/api/users/[id].ts
 import { query } from '@/lib/db';
-import { handleDatabaseError, sendErrorResponse, ApiError } from '@/lib/errors';
+import { handleDatabaseError, ApiError } from '@/lib/errors';
 
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
+    const result = await query('SELECT * FROM users WHERE id = $1', [id]);
     
-    if (req.method === 'GET') {
-      const result = await query(
-        'SELECT * FROM users WHERE id = $1',
-        [id]
-      );
-      
-      if (result.rows.length === 0) {
-        throw new ApiError(404, 'User not found', 'NOT_FOUND');
-      }
-      
-      res.json(result.rows[0]);
-    } else if (req.method === 'DELETE') {
-      const checkResult = await query(
-        'SELECT id FROM users WHERE id = $1',
-        [id]
-      );
-      
-      if (checkResult.rows.length === 0) {
-        throw new ApiError(404, 'User not found', 'NOT_FOUND');
-      }
-      
-      await query('DELETE FROM users WHERE id = $1', [id]);
-      res.status(204).send();
-    } else {
-      throw new ApiError(405, 'Method not allowed', 'METHOD_NOT_ALLOWED');
+    if (result.rows.length === 0) {
+      throw new ApiError(404, 'User not found', 'NOT_FOUND');
     }
+    
+    res.json(result.rows[0]);
   } catch (error: any) {
     if (error instanceof ApiError) {
-      return sendErrorResponse(res, error);
+      return res.status(error.statusCode).json({ error: error.message, code: error.code });
     }
     
     if (error.code && (error.code.startsWith('23') || error.code.startsWith('42'))) {
       const apiError = handleDatabaseError(error);
-      return sendErrorResponse(res, apiError);
+      return res.status(apiError.statusCode).json({ error: apiError.message, code: apiError.code });
     }
     
-    sendErrorResponse(res, error);
+    res.status(500).json({ error: 'An unexpected error occurred', code: 'INTERNAL_ERROR' });
   }
 }
 ```
@@ -129,47 +82,22 @@ import { query } from '@/lib/db';
 import { handleDatabaseError, ApiError } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const result = await query(
-      'SELECT * FROM users WHERE id = $1',
-      [params.id]
-    );
+    const result = await query('SELECT * FROM users WHERE id = $1', [params.id]);
     
     if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'User not found', code: 'NOT_FOUND' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found', code: 'NOT_FOUND' }, { status: 404 });
     }
     
     return NextResponse.json(result.rows[0]);
   } catch (error: any) {
     if (error.code && (error.code.startsWith('23') || error.code.startsWith('42'))) {
       const apiError = handleDatabaseError(error);
-      return NextResponse.json(
-        { error: apiError.message, code: apiError.code },
-        { status: apiError.statusCode }
-      );
+      return NextResponse.json({ error: apiError.message, code: apiError.code }, { status: apiError.statusCode });
     }
-    
-    console.error('Unexpected error:', error);
-    return NextResponse.json(
-      { error: 'An unexpected error occurred', code: 'INTERNAL_ERROR' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'An unexpected error occurred', code: 'INTERNAL_ERROR' }, { status: 500 });
   }
-}
-```
-
-**Error response format:**
-```json
-{
-  "error": "User not found",
-  "code": "NOT_FOUND"
 }
 ```
 
