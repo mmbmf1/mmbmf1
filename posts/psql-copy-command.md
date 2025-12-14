@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Had an 83MB CSV with 195k+ rows that needed to go into PostgreSQL. Didn't know psql had a `\copy` command, so I wanted to learn how to use it.
+Had an 83MB CSV with 195k+ rows that needed to go into PostgreSQL. Didn't know psql had a `\copy` command, so I wanted to learn how to use it. This works with any PostgreSQL instance, including Docker-based local development databases (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)). Once data is imported, you can query it through your application (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)).
 
 ## The Problem
 
@@ -63,3 +63,5 @@ This approach uses PostgreSQL's native CSV processing capabilities. We get effic
 - **Data migration** - Moving CSV data into production systems
 
 The clean integration with PostgreSQL means the heavy lifting happens at the database level while maintaining full SQL query capabilities.
+
+After importing data, you can query it directly through your Next.js API (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) or sync it between databases using Foreign Data Wrappers (see [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md)).

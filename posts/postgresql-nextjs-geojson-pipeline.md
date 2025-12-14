@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Built a geospatial data pipeline using PostgreSQL's PostGIS extension with Next.js API routes to generate GeoJSON from coordinate data. This approach uses database-level spatial processing instead of JavaScript calculations.
+Built a geospatial data pipeline using PostgreSQL's PostGIS extension with Next.js API routes to generate GeoJSON from coordinate data. This approach uses database-level spatial processing instead of JavaScript calculations. This builds on the database connection setup (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) and requires PostGIS-enabled PostgreSQL (see [docker-postgresql-setup.md](./docker-postgresql-setup.md) for using the `postgis/postgis` image).
 
 ## The Problem
 
@@ -54,11 +54,13 @@ POST /api/geojson/points
 ### Implementation
 
 ```typescript
-// Next.js API route implementation
+// Next.js API route - uses the database connection from nextjs-postgresql-connection.md
+import { query } from '@/lib/db';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { data, latField, lngField, properties } = req.body;
   
-  const result = await db.query(`
+  const result = await query(`
     SELECT generate_geojson_points($1, $2, $3, $4) as geojson
   `, [JSON.stringify(data), latField, lngField, properties]);
   
@@ -74,4 +76,4 @@ This approach uses PostGIS spatial indexes and geodetic calculations. We get coo
 - **Data visualization projects** - Efficient coordinate transformations  
 - **Real-time applications** - Processing location data streams
 
-The clean separation between the API layer and database processing means the heavy lifting happens in PostGIS while Next.js handles the HTTP interface.
+The clean separation between the API layer and database processing means the heavy lifting happens in PostGIS while Next.js handles the HTTP interface. This pattern combines efficient database connections (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) with specialized PostgreSQL extensions for domain-specific processing.

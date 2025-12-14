@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Recently built a data synchronization system using PostgreSQL Foreign Data Wrappers (FDW) to pull data from one database into another for analysis. This approach eliminates the need for traditional ETL tools while providing real-time access to cross-database data.
+Built a data synchronization system using PostgreSQL Foreign Data Wrappers (FDW) to pull data from one database into another for analysis. This approach eliminates the need for traditional ETL tools while providing real-time access to cross-database data. Works with any PostgreSQL instances, including Docker-based local development (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)).
 
 ## The Problem
 
@@ -104,3 +104,5 @@ This approach provides direct database-level access to cross-database data. We g
 - **Cloud → On-prem** data pipelines
 
 The clean separation between foreign server connections and local processing means the heavy lifting happens in PostgreSQL while maintaining full SQL query capabilities.
+
+Once data is synchronized, you can query it through Next.js API routes (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) or process it for specific use cases like geospatial data (see [postgresql-nextjs-geojson-pipeline.md](./postgresql-nextjs-geojson-pipeline.md)).
