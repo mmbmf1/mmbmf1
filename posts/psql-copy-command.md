@@ -64,4 +64,4 @@ This approach uses PostgreSQL's native CSV processing capabilities. We get effic
 
 The clean integration with PostgreSQL means the heavy lifting happens at the database level while maintaining full SQL query capabilities.
 
-After importing data, you can query it directly through your Next.js API (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) or sync it between databases using Foreign Data Wrappers (see [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md)).
+After importing data, you can query it directly through your Next.js API (see [nextjs-api-routes.md](./nextjs-api-routes.md)) or sync it between databases using Foreign Data Wrappers (see [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md)).

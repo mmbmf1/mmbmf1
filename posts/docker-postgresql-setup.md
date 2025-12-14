@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Set up a Docker-based PostgreSQL development environment for local API development. This approach keeps the database containerized and isolated from system PostgreSQL installations while providing persistent data storage. This is the foundation for connecting applications (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) and importing data (see [psql-copy-command.md](./psql-copy-command.md)).
+Set up a Docker-based PostgreSQL development environment for local API development. This approach keeps the database containerized and isolated from system PostgreSQL installations, making it easy to start, stop, and reset without affecting your system.
 
 ## The Problem
 
@@ -24,15 +24,14 @@ This works, but ties database setup to your local machine and makes it harder to
 
 ## The Solution
 
-Instead of installing PostgreSQL directly, we containerized the database using Docker Compose with an initialization system that loads schema and mock data automatically. The architecture flows from docker-compose configuration through initialization scripts to a running PostgreSQL container.
+Instead of installing PostgreSQL directly, we containerized the database using Docker Compose. The architecture flows from docker-compose configuration to a running PostgreSQL container accessible on localhost.
 
 ### Architecture Overview
 
-docker-compose.yml → PostgreSQL Container → Initialization Scripts → Persistent Volume
+docker-compose.yml → PostgreSQL Container → localhost:5432
 
-- **docker-compose.yml**: Defines the database service with PostgreSQL image
-- **db-init directory**: SQL files that run automatically on first container start
-- **Persistent volumes**: Data survives container restarts
+- **docker-compose.yml**: Defines the database service configuration
+- **PostgreSQL container**: Isolated database instance
 - **Port mapping**: Database accessible on localhost:5432
 
 ### Implementation
@@ -46,37 +45,35 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: your_database
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db-init:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres_data:
 ```
 
 **Note**: For specialized extensions, use alternative images like `postgis/postgis:15-3.3` for geospatial data, `timescale/timescaledb` for time-series data, or other PostgreSQL variants as needed. The standard `postgres` image works for most use cases.
 
-The `db-init` directory contains numbered SQL files (01-24) that PostgreSQL runs automatically on first container start. Files execute in alphabetical order, which is why they're numbered sequentially.
-
-**Initialization flow:**
-1. `01_create_databases.sql` - Creates databases
-2. `02-11` - Creates schemas and core tables
-3. `12_init_client_data.sql` - Inserts mock/test data
-4. `13-24` - Additional tables and reference data
-
-### Data Persistence
-
-Docker volumes store database data outside the container. This means data survives `docker-compose down` but gets deleted with `docker-compose down -v`. The volume approach provides persistence without tying data to the container lifecycle.
+### Starting the Database
 
 ```bash
-# Start database
+# Start database container
 docker-compose up -d
 
-# Stop (data persists)
-docker-compose down
+# Verify it's running
+docker ps | grep postgres_dev_db
 
-# Reset everything (data deleted)
-docker-compose down -v && docker-compose up -d
+# View logs
+docker-compose logs -f db
+
+# Stop database
+docker-compose down
 ```
+
+The database is now accessible at `localhost:5432` with username `postgres` and password `postgres`.
 
 ## Benefits
 
@@ -85,8 +82,8 @@ This approach provides isolated database environments that are easy to reset and
 - **Team consistency** - Everyone runs the same database setup
 - **Easy cleanup** - Reset with one command when things go wrong
 - **No system conflicts** - Containerized database doesn't interfere with system PostgreSQL
-- **Development workflows** - Mock data loads automatically on first start
+- **Quick setup** - One command to get a running database
 
-The clean separation between container configuration and initialization scripts means database setup is version-controlled and reproducible while maintaining full PostgreSQL capabilities.
+The clean separation between container configuration and your application means database setup is version-controlled and reproducible while maintaining full PostgreSQL capabilities.
 
-Once your database is running, you can connect to it from Next.js API routes (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) or import data using tools like `psql \copy` (see [psql-copy-command.md](./psql-copy-command.md)).
+Once your database is running, you can set up initialization scripts (see [database-initialization-scripts.md](./database-initialization-scripts.md)) to automatically load schema and data, or configure data persistence (see [docker-data-persistence.md](./docker-data-persistence.md)). Then connect your Next.js application (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)).

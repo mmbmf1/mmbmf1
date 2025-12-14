@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Built a geospatial data pipeline using PostgreSQL's PostGIS extension with Next.js API routes to generate GeoJSON from coordinate data. This approach uses database-level spatial processing instead of JavaScript calculations. This builds on the database connection setup (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) and requires PostGIS-enabled PostgreSQL (see [docker-postgresql-setup.md](./docker-postgresql-setup.md) for using the `postgis/postgis` image).
+Built a geospatial data pipeline using PostgreSQL's PostGIS extension with Next.js API routes to generate GeoJSON from coordinate data. This approach uses database-level spatial processing instead of JavaScript calculations. This builds on the database connection setup (see [nextjs-api-routes.md](./nextjs-api-routes.md)) and requires PostGIS-enabled PostgreSQL (see [postgis-setup-basics.md](./postgis-setup-basics.md) for PostGIS setup).
 
 ## The Problem
 
@@ -76,4 +76,4 @@ This approach uses PostGIS spatial indexes and geodetic calculations. We get coo
 - **Data visualization projects** - Efficient coordinate transformations  
 - **Real-time applications** - Processing location data streams
 
-The clean separation between the API layer and database processing means the heavy lifting happens in PostGIS while Next.js handles the HTTP interface. This pattern combines efficient database connections (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) with specialized PostgreSQL extensions for domain-specific processing.
+The clean separation between the API layer and database processing means the heavy lifting happens in PostGIS while Next.js handles the HTTP interface. This pattern combines efficient database connections (see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)) with specialized PostgreSQL extensions for domain-specific processing.

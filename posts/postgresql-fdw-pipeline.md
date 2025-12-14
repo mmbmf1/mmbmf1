@@ -105,4 +105,4 @@ This approach provides direct database-level access to cross-database data. We g
 
 The clean separation between foreign server connections and local processing means the heavy lifting happens in PostgreSQL while maintaining full SQL query capabilities.
 
-Once data is synchronized, you can query it through Next.js API routes (see [nextjs-postgresql-connection.md](./nextjs-postgresql-connection.md)) or process it for specific use cases like geospatial data (see [postgresql-nextjs-geojson-pipeline.md](./postgresql-nextjs-geojson-pipeline.md)).
+Once data is synchronized, you can query it through Next.js API routes (see [nextjs-api-routes.md](./nextjs-api-routes.md)) or process it for specific use cases like geospatial data (see [building-geojson-apis.md](./building-geojson-apis.md)).

@@ -8,6 +8,8 @@
 
 Set up a type-safe PostgreSQL connection for Next.js API routes that handles connection pooling and environment configuration. This approach provides a clean database client interface that works seamlessly with Docker-based local development (see [docker-postgresql-setup.md](./docker-postgresql-setup.md)) and production environments.
 
+For detailed coverage, see [postgresql-connection-pooling.md](./postgresql-connection-pooling.md) for connection pooling and [nextjs-api-routes.md](./nextjs-api-routes.md) for using the connection in API routes.
+
 ## The Problem
 
 When building Next.js APIs that need database access, you need to establish PostgreSQL connections efficiently. The typical approaches involve creating new connections for each request or manually managing connection pools, which leads to connection leaks and poor performance.
