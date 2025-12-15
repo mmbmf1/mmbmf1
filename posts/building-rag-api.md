@@ -4,15 +4,15 @@
 
 # Building a RAG API with PostgreSQL and Next.js
 
-![RAG Architecture](./images/rag-architecture.png)
+<!-- ![RAG Architecture](images/rag-architecture.png) -->
 
 ## Introduction
 
-RAG (Retrieval Augmented Generation) API using pgvector and Next.js. Semantic search + LLM generation. Store embeddings, retrieve context, generate answers.
+RAG (Retrieval Augmented Generation) API using pgvector and Next.js. Semantic search + LLM generation. Store embeddings, retrieve context, generate answers. Combines the power of semantic search with large language models to create intelligent applications that can answer questions based on your own data. Perfect for building AI assistants, documentation systems, and knowledge bases.
 
 ## The Problem
 
-Sending all documents to LLMs can hit token limits and doesn't scale well for large document collections.
+Sending all documents to LLMs can hit token limits and doesn't scale well for large document collections. Large language models have token limits, and sending entire document collections quickly exhausts those limits. Even if you could send everything, you're paying for processing irrelevant context. As your document collection grows, this approach becomes completely impractical.
 
 ```typescript
 const allDocs = await query('SELECT content FROM documents');
@@ -22,7 +22,7 @@ const answer = await callLLM(prompt);
 
 ## The Solution
 
-Use vector similarity search to retrieve only relevant context, then combine with user question.
+Use vector similarity search to retrieve only relevant context, then combine with user question. Generate an embedding for the user's question, then use vector similarity search to find the most relevant documents. Retrieve only the top-k most similar documents as context, keeping your prompt within token limits while ensuring the LLM has relevant information to answer the question.
 
 **Document ingestion:**
 ```typescript
@@ -168,9 +168,9 @@ export async function POST(request: Request) {
 
 ## Benefits
 
-- Question answering - Answer using document context
-- Document Q&A - Query large collections
-- Knowledge bases - Searchable systems
-- AI assistants - Context-aware responses
+- **Question answering** - Answer using document context. LLMs can provide accurate, contextual answers based on your own data instead of generic responses.
+- **Document Q&A** - Query large collections. Users can ask questions about thousands or millions of documents, and the system finds relevant context automatically.
+- **Knowledge bases** - Searchable systems. Build intelligent knowledge bases that understand questions and retrieve relevant information automatically.
+- **AI assistants** - Context-aware responses. Create AI assistants that answer questions based on your documentation, codebase, or any text corpus you provide.
 
 Next: Complete RAG implementation ready to use.

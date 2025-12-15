@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Auto-run SQL scripts on first container start. Consistent schema and seed data without manual steps.
+Auto-run SQL scripts on first container start. Consistent schema and seed data without manual steps. PostgreSQL's Docker image automatically executes any SQL files you place in the initialization directory. This means every developer on your team gets the exact same database setup every time.
 
 ## The Problem
 
-Manual script execution can be error-prone and doesn't scale well across team members.
+Manual script execution can be error-prone and doesn't scale well across team members. Someone has to remember to run the right scripts in the right order every time they set up their environment. New team members might miss steps or run scripts in the wrong order, leading to inconsistent database states. Documentation gets out of date, and setup becomes a frustrating process.
 
 ```bash
 docker-compose up -d
@@ -20,7 +20,7 @@ psql -h localhost -U postgres -d your_database -f seed_data.sql
 
 ## The Solution
 
-Mount SQL files to `/docker-entrypoint-initdb.d`. Files run alphabetically on first start only.
+Mount SQL files to `/docker-entrypoint-initdb.d`. Files run alphabetically on first start only. PostgreSQL's Docker image automatically executes any SQL files in this directory when the database is first initialized. Number your files to control execution order, and they'll run automatically every time someone starts a fresh database container.
 
 ```yaml
 # docker-compose.yml
@@ -68,9 +68,9 @@ INSERT INTO app.users (email, name) VALUES
 
 ## Benefits
 
-- Team consistency - Same setup automatically
-- Version control - SQL files in git
-- Reproducibility - Fresh setup in one command
-- Easy reset - Remove volumes and restart
+- **Team consistency** - Same setup automatically. Everyone gets identical schemas and seed data without manual steps or documentation to follow.
+- **Version control** - SQL files in git. Your database schema becomes part of your codebase, with full history and review capabilities.
+- **Reproducibility** - Fresh setup in one command. New developers can get a fully configured database with `docker-compose up`, no additional steps needed.
+- **Easy reset** - Remove volumes and restart. When you need a clean slate, just delete volumes and start over - initialization scripts run automatically.
 
 Next: [docker-data-persistence.md](./docker-data-persistence.md) | [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)

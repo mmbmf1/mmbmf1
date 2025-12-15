@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Generate GeoJSON from PostGIS geometry data in Next.js APIs. Database-level spatial processing, not JavaScript calculations.
+Generate GeoJSON from PostGIS geometry data in Next.js APIs. Database-level spatial processing, not JavaScript calculations. PostgreSQL handles the heavy lifting of spatial operations, and your API simply formats the results. This approach scales much better than processing coordinates in your application code.
 
 ## The Problem
 
-Processing coordinates in JavaScript can be slow for large datasets.
+Processing coordinates in JavaScript can be slow for large datasets. When you fetch raw coordinate data and transform it to GeoJSON in your application, you're doing work that PostgreSQL could handle much more efficiently. Large datasets mean transferring unnecessary data over the network and processing it in memory, which becomes a bottleneck as data grows.
 
 ```javascript
 const features = data.map(point => ({
@@ -22,7 +22,7 @@ const features = data.map(point => ({
 
 ## The Solution
 
-Use PostGIS `ST_AsGeoJSON` to generate GeoJSON at the database level.
+Use PostGIS `ST_AsGeoJSON` to generate GeoJSON at the database level. PostgreSQL's `ST_AsGeoJSON` function converts geometry data directly to GeoJSON format, and `jsonb_build_object` lets you construct complete FeatureCollection objects in SQL. This means your API just returns the formatted JSON without any JavaScript processing.
 
 **Query existing PostGIS data:**
 ```typescript
@@ -109,9 +109,9 @@ const result = await query(`
 
 ## Benefits
 
-- Performance - Database handles spatial operations
-- Standards - GeoJSON is widely supported
-- Efficiency - No JavaScript processing needed
-- Functionality - Full PostGIS spatial capabilities
+- **Performance** - Database handles spatial operations. PostGIS processes spatial queries efficiently using indexes, and generates GeoJSON without transferring raw coordinate data.
+- **Standards** - GeoJSON is widely supported. The GeoJSON format works seamlessly with mapping libraries, GIS tools, and other geospatial applications.
+- **Efficiency** - No JavaScript processing needed. PostgreSQL does all the formatting work, keeping your API code simple and fast.
+- **Functionality** - Full PostGIS spatial capabilities. You can filter by bounds, radius, or any spatial relationship while generating GeoJSON in the same query.
 
 Next: [pgvector-setup.md](./pgvector-setup.md)

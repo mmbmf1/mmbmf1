@@ -4,15 +4,15 @@
 
 # PostGIS Setup and Geospatial Basics
 
-![PostGIS Spatial Queries](./images/postgis-queries.png)
+<!-- ![PostGIS Spatial Queries](images/postgis-queries.png) -->
 
 ## Introduction
 
-PostGIS extension for PostgreSQL. Store geometry data, perform spatial queries, calculate distances in the database.
+PostGIS extension for PostgreSQL. Store geometry data, perform spatial queries, calculate distances in the database. Perfect for applications that need to work with maps, locations, or geographic data. PostGIS brings powerful spatial capabilities directly into your PostgreSQL database.
 
 ## The Problem
 
-Separate lat/lng columns don't support spatial queries or efficient spatial indexing.
+Separate lat/lng columns don't support spatial queries or efficient spatial indexing. Calculating distances between points requires complex trigonometry in your application code. Finding points within a radius or performing other spatial operations becomes slow and error-prone. You can't leverage spatial indexes that make these operations fast.
 
 ```sql
 CREATE TABLE locations (
@@ -25,7 +25,7 @@ CREATE TABLE locations (
 
 ## The Solution
 
-Use PostGIS geometry types and spatial functions.
+Use PostGIS geometry types and spatial functions. Store locations as geometry objects instead of separate latitude and longitude columns. PostGIS provides powerful spatial functions for distance calculations, area measurements, and spatial relationships. Spatial indexes (GIST) make these operations incredibly fast, even with millions of points.
 
 **Docker setup:**
 ```yaml
@@ -93,9 +93,9 @@ SELECT name, ST_AsGeoJSON(coordinates) as geojson FROM locations;
 
 ## Benefits
 
-- Performance - Spatial indexes for fast queries
-- Functionality - Rich spatial operations
-- Standards - Standard coordinate systems
-- Efficiency - Database handles calculations
+- **Performance** - Spatial indexes for fast queries. GIST indexes make spatial operations like "find all points within radius" incredibly fast, even with millions of records.
+- **Functionality** - Rich spatial operations. Calculate distances, areas, intersections, and more without writing complex application code.
+- **Standards** - Standard coordinate systems. PostGIS supports all standard coordinate reference systems, ensuring compatibility with mapping tools and other geospatial systems.
+- **Efficiency** - Database handles calculations. Let PostgreSQL do the heavy lifting instead of processing coordinates in your application code.
 
 Next: [building-geojson-apis.md](./building-geojson-apis.md)

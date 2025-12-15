@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Vector similarity search queries with pgvector. Find semantically similar content using cosine similarity and vector indexes.
+Vector similarity search queries with pgvector. Find semantically similar content using cosine similarity and vector indexes. This enables powerful features like finding similar documents, recommendations, and semantic search. All processed efficiently in the database without moving large amounts of data to your application.
 
 ## The Problem
 
-Application-level similarity calculation can be slow and may not scale well for large datasets.
+Application-level similarity calculation can be slow and may not scale well for large datasets. Fetching all embeddings and calculating similarities in JavaScript means transferring massive amounts of data over the network. As your dataset grows, this approach becomes completely impractical. Vector operations are computationally expensive, and doing them in your application code doesn't leverage database optimizations.
 
 ```typescript
 const queryEmbedding = await generateEmbedding(query);
@@ -24,7 +24,7 @@ const results = similarities.sort((a, b) => b.similarity - a.similarity).slice(0
 
 ## The Solution
 
-Use pgvector similarity operators at the database level.
+Use pgvector similarity operators at the database level. Let PostgreSQL calculate similarities using optimized vector operations and indexes. The `<=>` operator calculates cosine distance efficiently, and vector indexes make these operations fast even with millions of vectors. You can combine vector search with traditional keyword search for hybrid approaches.
 
 **Basic similarity search:**
 ```typescript
@@ -109,9 +109,9 @@ export async function GET(request: Request) {
 
 ## Benefits
 
-- Semantic search - Find content by meaning
-- Performance - Database-level operations
-- Flexibility - Combine with keyword search
-- Scalability - Works with large datasets
+- **Semantic search** - Find content by meaning. Vector similarity search understands context and relationships, not just exact keyword matches.
+- **Performance** - Database-level operations. PostgreSQL handles vector calculations efficiently using specialized indexes and optimized operators.
+- **Flexibility** - Combine with keyword search. You can blend semantic search with traditional full-text search for the best of both worlds.
+- **Scalability** - Works with large datasets. Vector indexes make similarity search fast even with millions of documents, enabling real-time semantic search at scale.
 
 Next: [building-rag-api.md](./building-rag-api.md)

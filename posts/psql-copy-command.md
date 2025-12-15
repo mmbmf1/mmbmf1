@@ -6,15 +6,15 @@
 
 ## Introduction
 
-Import large CSV files directly into PostgreSQL using `\copy`. Fast, reliable, no external tools needed.
+Import large CSV files directly into PostgreSQL using `\copy`. Fast, reliable, no external tools needed. This native PostgreSQL command handles large imports efficiently and works seamlessly with your existing database setup. Much faster than GUI tools or custom import scripts.
 
 ## The Problem
 
-GUI tools and custom scripts can be slow for large CSV imports. Looking for a simpler approach.
+GUI tools and custom scripts can be slow for large CSV imports. Looking for a simpler approach. GUI database tools often struggle with large files, timing out or consuming excessive memory. Custom import scripts add complexity and maintenance overhead. You need something fast, reliable, and built into PostgreSQL itself.
 
 ## The Solution
 
-Use psql's `\copy` command for direct database-level CSV import.
+Use psql's `\copy` command for direct database-level CSV import. This native PostgreSQL command reads CSV files directly and inserts data efficiently. It handles headers, delimiters, and data types automatically, making imports straightforward. Works seamlessly with Docker containers and local PostgreSQL installations.
 
 **Basic import:**
 ```sql
@@ -54,9 +54,9 @@ docker exec -i container_name psql -U postgres -d your_database -c "\copy stagin
 
 ## Benefits
 
-- Fast - Direct database import
-- Reliable - Native PostgreSQL support
-- Simple - One command
-- Flexible - Works with any CSV format
+- **Fast** - Direct database import without intermediate processing. PostgreSQL reads and inserts data efficiently, handling large files without memory issues.
+- **Reliable** - Native PostgreSQL support means no external dependencies or compatibility issues. Works consistently across different environments.
+- **Simple** - One command to import entire CSV files. No complex scripts or GUI tools needed - just a straightforward command-line operation.
+- **Flexible** - Works with any CSV format. You can specify delimiters, handle headers, select specific columns, and even export data using the same command.
 
 Next: [postgresql-fdw-pipeline.md](./postgresql-fdw-pipeline.md) | [nextjs-api-routes.md](./nextjs-api-routes.md)

@@ -6,11 +6,11 @@
 
 ## Introduction
 
-DELETE endpoints with existence checks and constraint handling. Safe deletion with proper error responses.
+DELETE endpoints with existence checks and constraint handling. Safe deletion with proper error responses. These patterns ensure you never delete records that don't exist and handle foreign key constraints gracefully. Provides clear feedback to API consumers about what happened with their deletion request.
 
 ## The Problem
 
-Deleting without checking if records exist can lead to confusing responses. Missing foreign key constraint handling can cause unclear errors.
+Deleting without checking if records exist can lead to confusing responses. Missing foreign key constraint handling can cause unclear errors. If you delete a record that doesn't exist, PostgreSQL silently succeeds, leaving API consumers confused about whether anything actually happened. When foreign key constraints prevent deletion, PostgreSQL returns cryptic error codes that don't help users understand why deletion failed.
 
 ```typescript
 const sql = `DELETE FROM users WHERE id = ${id}`;
@@ -18,7 +18,7 @@ const sql = `DELETE FROM users WHERE id = ${id}`;
 
 ## The Solution
 
-Check existence first, handle constraints, use parameterized queries.
+Check existence first, handle constraints, use parameterized queries. Verify the record exists before attempting deletion, giving clear 404 responses when appropriate. Catch foreign key constraint violations and return meaningful error messages that explain why deletion isn't possible. Always use parameterized queries to prevent SQL injection.
 
 **Basic delete:**
 ```typescript
@@ -106,9 +106,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
 ## Benefits
 
-- Safety - Verifies existence before deletion
-- Reliability - Handles constraints gracefully
-- User experience - Clear error messages
-- Flexibility - Supports hard and soft deletes
+- **Safety** - Verifies existence before deletion. API consumers get clear feedback about whether a record exists, preventing confusion about deletion results.
+- **Reliability** - Handles constraints gracefully. When foreign key relationships prevent deletion, your API explains why clearly instead of returning cryptic database errors.
+- **User experience** - Clear error messages that help API consumers understand what happened. Proper HTTP status codes make error handling straightforward for client applications.
+- **Flexibility** - Supports hard and soft deletes. You can implement permanent deletion or soft deletion patterns depending on your application's needs.
 
 Next: [input-validation-patterns.md](./input-validation-patterns.md)

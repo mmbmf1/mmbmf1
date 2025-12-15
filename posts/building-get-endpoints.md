@@ -6,11 +6,11 @@
 
 ## Introduction
 
-GET endpoints with parameterized queries. Safe, efficient, handles filtering and errors.
+GET endpoints with parameterized queries. Safe, efficient, handles filtering and errors. These patterns protect against SQL injection while keeping your code readable and maintainable. Perfect for building APIs that retrieve data with various filters and search capabilities.
 
 ## The Problem
 
-String concatenation in queries can lead to SQL injection vulnerabilities.
+String concatenation in queries can lead to SQL injection vulnerabilities. When you build SQL queries by concatenating user input directly into strings, malicious users can inject their own SQL code. This is one of the most common and dangerous security vulnerabilities in web applications. Even if you think your input is safe, edge cases and unexpected input formats can create vulnerabilities.
 
 ```typescript
 const result = await query(`SELECT * FROM users WHERE id = ${req.query.id}`);
@@ -18,7 +18,7 @@ const result = await query(`SELECT * FROM users WHERE id = ${req.query.id}`);
 
 ## The Solution
 
-Use parameterized queries with proper error handling.
+Use parameterized queries with proper error handling. PostgreSQL treats parameters as data, not SQL code, completely preventing injection attacks. The database engine separates the query structure from the data values, making it impossible for user input to be interpreted as SQL commands. This approach is both safer and more efficient than string concatenation.
 
 **Single record:**
 ```typescript
@@ -98,9 +98,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 ## Benefits
 
-- Security - Prevents SQL injection
-- Performance - Efficient queries
-- Consistency - Standard patterns
-- Maintainability - Clear code
+- **Security** - Prevents SQL injection by design. Parameterized queries make it impossible for user input to be executed as SQL code.
+- **Performance** - Efficient queries that PostgreSQL can optimize and cache. The query planner can reuse execution plans for similar queries with different parameters.
+- **Consistency** - Standard patterns that work the same way across all your endpoints. Once you learn the pattern, you can apply it everywhere.
+- **Maintainability** - Clear code that's easy to read and understand. Other developers can quickly see what data is being queried and how.
 
 Next: [building-post-endpoints.md](./building-post-endpoints.md)

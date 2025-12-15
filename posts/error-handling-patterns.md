@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Consistent error handling across API routes. Clear error responses, proper HTTP status codes, secure error messages.
+Consistent error handling across API routes. Clear error responses, proper HTTP status codes, secure error messages. Good error handling protects sensitive information while helping developers debug issues. Creates a predictable API experience that consumers can rely on.
 
 ## The Problem
 
-Generic error messages can expose database internals and create a confusing experience for API consumers.
+Generic error messages can expose database internals and create a confusing experience for API consumers. When you return raw database error messages, you might accidentally reveal sensitive information about your database structure, table names, or internal implementation details. Even worse, PostgreSQL error codes like `23505` don't mean anything to API consumers who just want to know what went wrong.
 
 ```typescript
 try {
@@ -22,7 +22,7 @@ try {
 
 ## The Solution
 
-Use error handling utilities with consistent error formats.
+Use error handling utilities with consistent error formats. Create a centralized error handling system that translates database errors into user-friendly messages while maintaining proper HTTP status codes. This ensures all your endpoints return errors in the same format, making your API predictable and easy to consume.
 
 **Error handling utility:**
 ```typescript
@@ -109,9 +109,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 ## Benefits
 
-- User experience - Clear, actionable error messages
-- Security - Don't expose database internals
-- Consistency - Standardized error format
-- Debugging - Proper logging while hiding details
+- **User experience** - Clear, actionable error messages that help API consumers understand what went wrong and how to fix it. No more decoding cryptic database error codes.
+- **Security** - Don't expose database internals. Error messages hide sensitive information about your database structure while still providing useful feedback.
+- **Consistency** - Standardized error format across all endpoints. API consumers can handle errors uniformly, simplifying client-side error handling code.
+- **Debugging** - Proper logging while hiding details. You can log full error details server-side for debugging while returning sanitized messages to clients.
 
 Next: [basic-query-patterns.md](./basic-query-patterns.md)

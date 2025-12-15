@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Validate request data before database operations. Clear error messages, prevents invalid data.
+Validate request data before database operations. Clear error messages, prevents invalid data. Catching errors early saves database resources and provides better feedback to API consumers. Essential for building APIs that are both secure and user-friendly.
 
 ## The Problem
 
-Minimal validation can lead to unclear errors and unnecessary database load.
+Minimal validation can lead to unclear errors and unnecessary database load. When invalid data reaches your database, PostgreSQL returns cryptic error codes that don't help API consumers understand what went wrong. Worse, invalid data might pass initial checks but cause problems later, wasting database resources on operations that are doomed to fail.
 
 ```typescript
 const { email, name } = req.body;
@@ -19,7 +19,7 @@ const result = await query('INSERT INTO users (email, name) VALUES ($1, $2)', [e
 
 ## The Solution
 
-Validate in the API layer before database operations.
+Validate in the API layer before database operations. Check data types, formats, and constraints before sending queries to PostgreSQL. This catches errors early and provides clear, actionable feedback to API consumers. Use validation libraries like Zod for type-safe validation that integrates seamlessly with TypeScript.
 
 **Manual validation:**
 ```typescript
@@ -114,9 +114,9 @@ export async function POST(request: Request) {
 
 ## Benefits
 
-- User experience - Clear, actionable errors
-- Performance - Catch errors before database queries
-- Data integrity - Only valid data reaches database
-- Maintainability - Centralized validation logic
+- **User experience** - Clear, actionable errors that tell API consumers exactly what's wrong and how to fix it. No more guessing about cryptic database error codes.
+- **Performance** - Catch errors before database queries. Invalid data is rejected immediately, saving database resources and improving response times.
+- **Data integrity** - Only valid data reaches database. Your database constraints become a safety net rather than the primary validation mechanism.
+- **Maintainability** - Centralized validation logic that's easy to update and test. Changes to validation rules happen in one place, not scattered across your codebase.
 
 Next: [error-handling-patterns.md](./error-handling-patterns.md)

@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Geospatial data pipeline using PostGIS with Next.js API routes. Database-level spatial processing, not JavaScript calculations.
+Geospatial data pipeline using PostGIS with Next.js API routes. Database-level spatial processing, not JavaScript calculations. This approach leverages PostgreSQL's spatial capabilities to handle complex geographic operations efficiently. Your Next.js API simply formats the results, keeping your application code clean and performant.
 
 ## The Problem
 
-Processing coordinates in JavaScript can be slow for large datasets.
+Processing coordinates in JavaScript can be slow for large datasets. When you fetch raw coordinate data and transform it to GeoJSON in your application, you're doing work that PostgreSQL could handle much more efficiently. Large datasets mean transferring unnecessary data over the network and processing it in memory, which becomes a bottleneck as data grows.
 
 ```javascript
 const features = data.map(point => ({
@@ -22,7 +22,7 @@ const features = data.map(point => ({
 
 ## The Solution
 
-Use PostGIS database functions to generate GeoJSON at the database level.
+Use PostGIS database functions to generate GeoJSON at the database level. Create PostgreSQL functions that handle the GeoJSON transformation, keeping your API code simple. For existing PostGIS data, use `ST_AsGeoJSON` and `jsonb_build_object` to construct complete FeatureCollection objects directly in SQL queries.
 
 **API endpoint:**
 ```typescript
@@ -107,9 +107,9 @@ export default async function handler(req, res) {
 
 ## Benefits
 
-- Mapping applications - Real-time geospatial data processing
-- Data visualization - Efficient coordinate transformations
-- Performance - Database handles spatial operations
-- Standards - GeoJSON is widely supported
+- **Mapping applications** - Real-time geospatial data processing. Your API can serve GeoJSON data efficiently for mapping libraries and GIS applications.
+- **Data visualization** - Efficient coordinate transformations. PostgreSQL handles all the spatial calculations and formatting, keeping your API endpoints fast and simple.
+- **Performance** - Database handles spatial operations. PostGIS processes spatial queries efficiently using indexes, generating GeoJSON without transferring raw coordinate data.
+- **Standards** - GeoJSON is widely supported. The GeoJSON format works seamlessly with mapping libraries, GIS tools, and other geospatial applications.
 
 This builds on [nextjs-api-routes.md](./nextjs-api-routes.md) and [postgis-setup-basics.md](./postgis-setup-basics.md). See [building-geojson-apis.md](./building-geojson-apis.md) for more examples.

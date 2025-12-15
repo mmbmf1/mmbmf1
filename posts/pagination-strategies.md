@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Pagination with LIMIT and OFFSET. Handle large datasets efficiently with navigation metadata.
+Pagination with LIMIT and OFFSET. Handle large datasets efficiently with navigation metadata. Essential for any API that might return more data than a client can reasonably handle in one request. Provides a smooth browsing experience while keeping response sizes manageable.
 
 ## The Problem
 
-Returning all data can be slow and consume excessive bandwidth for large datasets.
+Returning all data can be slow and consume excessive bandwidth for large datasets. When you have thousands or millions of records, fetching everything in one request becomes impractical. Response times increase, memory usage spikes, and network transfer becomes a bottleneck. Mobile clients especially struggle with large payloads.
 
 ```typescript
 const result = await query('SELECT * FROM users');
@@ -19,7 +19,7 @@ res.json(result.rows); // Could be thousands of records
 
 ## The Solution
 
-Use LIMIT and OFFSET with metadata for navigation.
+Use LIMIT and OFFSET with metadata for navigation. Break large result sets into manageable pages, returning only the records requested along with metadata that helps clients navigate through pages. Include information like total count, current page, and whether more pages exist.
 
 **Offset-based pagination:**
 ```typescript
@@ -112,9 +112,9 @@ export async function GET(request: Request) {
 
 ## Benefits
 
-- Performance - Only fetch requested page
-- User experience - Manageable result sets
-- Scalability - Works well as data grows
-- Flexibility - Support different strategies
+- **Performance** - Only fetch requested page. Database queries return small, fast result sets instead of transferring massive amounts of data.
+- **User experience** - Manageable result sets that load quickly and don't overwhelm clients. Users can navigate through data at their own pace.
+- **Scalability** - Works well as data grows. Pagination performance stays consistent whether you have thousands or millions of records.
+- **Flexibility** - Support different strategies. Offset-based pagination for page numbers, cursor-based for consistent results even as data changes.
 
 Next: [query-performance-optimization.md](./query-performance-optimization.md)

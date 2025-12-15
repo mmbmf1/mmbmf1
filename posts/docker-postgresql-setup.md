@@ -4,15 +4,15 @@
 
 # Setting Up Docker for Local PostgreSQL Development
 
-![Docker PostgreSQL Setup](./images/docker-postgresql-setup.png)
+<!-- ![Docker PostgreSQL Setup](images/docker-postgresql-setup.png) -->
 
 ## Introduction
 
-Docker-based PostgreSQL setup for local development. Isolated, easy to reset, consistent across teams.
+Docker-based PostgreSQL setup for local development. Isolated, easy to reset, consistent across teams. Perfect for developers who want a clean database environment without modifying their system. Works seamlessly with Docker Compose for simple container management.
 
 ## The Problem
 
-Installing PostgreSQL directly can conflict with system installations and make cleanup more difficult.
+Installing PostgreSQL directly can conflict with system installations and make cleanup more difficult. Different team members might have different versions installed, leading to inconsistent development environments. When you need to reset or remove PostgreSQL, it can leave behind configuration files and data directories that are hard to track down.
 
 ```bash
 brew install postgresql
@@ -23,7 +23,7 @@ createdb your_database
 
 ## The Solution
 
-Use Docker Compose to run PostgreSQL in a container.
+Use Docker Compose to run PostgreSQL in a container. This keeps your database completely isolated from your system and makes it easy to start, stop, and reset. The configuration is version-controlled in a simple YAML file that anyone on your team can use to get the exact same setup.
 
 ```yaml
 # docker-compose.yml
@@ -67,9 +67,9 @@ docker-compose down -v && docker-compose up -d
 
 ## Benefits
 
-- Team consistency - Same setup everywhere
-- Easy cleanup - Reset with one command
-- No system conflicts - Isolated container
-- Quick setup - One command to start
+- **Team consistency** - Same setup everywhere. Everyone runs the same PostgreSQL version with identical configuration, eliminating "works on my machine" issues.
+- **Easy cleanup** - Reset with one command. When you need a fresh database, just remove the volume and restart. No manual cleanup of system files needed.
+- **No system conflicts** - Isolated container. Your Docker PostgreSQL instance won't interfere with any system-level PostgreSQL installations or other services.
+- **Quick setup** - One command to start. New team members can be up and running in seconds, not minutes or hours.
 
 Next: [database-initialization-scripts.md](./database-initialization-scripts.md) | [docker-data-persistence.md](./docker-data-persistence.md) | [postgresql-connection-pooling.md](./postgresql-connection-pooling.md)

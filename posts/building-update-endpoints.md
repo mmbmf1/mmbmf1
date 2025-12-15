@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Update endpoints with dynamic query building. Supports partial updates (PATCH) and full replacement (PUT).
+Update endpoints with dynamic query building. Supports partial updates (PATCH) and full replacement (PUT). This approach lets you update only the fields that changed, making your API more efficient and flexible. Handles both partial updates and full record replacement with proper error handling.
 
 ## The Problem
 
-Updating all fields even when only one changed can be inefficient. String concatenation in queries can be unsafe.
+Updating all fields even when only one changed can be inefficient. String concatenation in queries can be unsafe. If a client only wants to update a user's email, forcing them to send all fields wastes bandwidth and can overwrite data unintentionally. Building queries with string concatenation reintroduces SQL injection risks that parameterized queries eliminate.
 
 ```typescript
 const sql = `UPDATE users SET email='${email}', name='${name}', role='${role}' WHERE id=${id}`;
@@ -18,7 +18,7 @@ const sql = `UPDATE users SET email='${email}', name='${name}', role='${role}' W
 
 ## The Solution
 
-Build dynamic queries that only update provided fields.
+Build dynamic queries that only update provided fields. Check which fields are present in the request body, build the UPDATE clause dynamically using parameterized queries, and only update what changed. This gives you the flexibility of partial updates while maintaining security and efficiency.
 
 **PATCH - Partial updates:**
 ```typescript
@@ -129,9 +129,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
 ## Benefits
 
-- Flexibility - Support both PATCH and PUT
-- Efficiency - Only update fields that changed
-- Security - Parameterized queries prevent SQL injection
-- User experience - Clear error messages
+- **Flexibility** - Support both PATCH and PUT patterns. PATCH for partial updates when clients only send changed fields, PUT for full replacement when you need complete record updates.
+- **Efficiency** - Only update fields that changed. This reduces database load and prevents unnecessary writes, improving performance especially for frequently updated records.
+- **Security** - Parameterized queries prevent SQL injection. Even though you're building queries dynamically, parameters are still safely separated from SQL structure.
+- **User experience** - Clear error messages when records don't exist or updates fail. Proper HTTP status codes help API consumers handle errors appropriately.
 
 Next: [building-delete-endpoints.md](./building-delete-endpoints.md)

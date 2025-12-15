@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Sync data between PostgreSQL databases using Foreign Data Wrappers. Direct cross-database queries without ETL tools.
+Sync data between PostgreSQL databases using Foreign Data Wrappers. Direct cross-database queries without ETL tools. FDWs let you query remote databases as if they were local tables, making data synchronization straightforward. Perfect for keeping multiple databases in sync or building data pipelines.
 
 ## The Problem
 
-Manual exports and imports may not provide real-time access and can be hard to maintain.
+Manual exports and imports may not provide real-time access and can be hard to maintain. Exporting data to CSV files and importing them into another database creates delays and requires manual intervention. As data changes frequently, keeping databases in sync becomes a constant chore. This approach doesn't scale well and introduces opportunities for errors.
 
 ```sql
 COPY (SELECT * FROM source_table) TO '/tmp/export.csv';
@@ -19,7 +19,7 @@ COPY target_table FROM '/tmp/export.csv';
 
 ## The Solution
 
-Use Foreign Data Wrappers to query remote databases directly.
+Use Foreign Data Wrappers to query remote databases directly. FDWs create a bridge between databases, letting you query remote tables as if they were local. You can join local and remote tables, sync data efficiently, and even perform real-time queries across database boundaries. All without external ETL tools or manual file transfers.
 
 **Setup:**
 ```sql
@@ -88,9 +88,9 @@ DROP SERVER source_server;
 
 ## Benefits
 
-- Real-time access - Query remote data directly
-- No ETL tools - Built into PostgreSQL
-- Flexible - Join local and remote tables
-- Efficient - Database-level operations
+- **Real-time access** - Query remote data directly without exporting and importing files. Changes in the source database are immediately queryable from your local database.
+- **No ETL tools** - Built into PostgreSQL. No need for separate ETL pipelines or external tools - FDWs are a native PostgreSQL feature.
+- **Flexible** - Join local and remote tables seamlessly. You can combine data from multiple sources in a single query, enabling powerful cross-database operations.
+- **Efficient** - Database-level operations. PostgreSQL handles the networking and data transfer efficiently, making cross-database queries fast and reliable.
 
 Next: [nextjs-api-routes.md](./nextjs-api-routes.md) | [building-geojson-apis.md](./building-geojson-apis.md)

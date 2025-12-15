@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Optimize PostgreSQL queries with indexes, efficient patterns, and query analysis. Faster responses, better scalability.
+Optimize PostgreSQL queries with indexes, efficient patterns, and query analysis. Faster responses, better scalability. Understanding how PostgreSQL executes your queries helps you identify bottlenecks and optimize effectively. Essential knowledge for building APIs that perform well as your data grows.
 
 ## The Problem
 
-Queries can become slow as data grows without proper indexes and optimization.
+Queries can become slow as data grows without proper indexes and optimization. As your database grows from thousands to millions of records, queries that were fast can suddenly become painfully slow. Without indexes, PostgreSQL has to scan entire tables, which becomes exponentially slower as data increases. Poor query patterns can also waste resources even when indexes exist.
 
 ```typescript
 const result = await query('SELECT * FROM users WHERE email = $1', [email]);
@@ -19,7 +19,7 @@ const activeUsers = result.rows.filter(u => u.active);
 
 ## The Solution
 
-Optimize at the database level with indexes and efficient patterns.
+Optimize at the database level with indexes and efficient patterns. Create indexes on columns you frequently query, use EXPLAIN ANALYZE to understand query execution plans, and write queries that leverage indexes effectively. Select only the columns you need, use LIMIT to cap result sizes, and structure JOINs efficiently.
 
 **Adding indexes:**
 ```sql
@@ -101,9 +101,9 @@ const pool = new Pool({
 
 ## Benefits
 
-- Performance - Faster query execution
-- Scalability - Handles growing datasets efficiently
-- Resource usage - Reduced database load
-- User experience - Faster API responses
+- **Performance** - Faster query execution through proper indexing and query optimization. Well-indexed queries can be orders of magnitude faster than full table scans.
+- **Scalability** - Handles growing datasets efficiently. Performance stays consistent as your data grows from thousands to millions of records.
+- **Resource usage** - Reduced database load. Efficient queries use less CPU, memory, and I/O, allowing your database to handle more concurrent requests.
+- **User experience** - Faster API responses. Optimized queries mean snappy API endpoints that keep users engaged.
 
 Next: [psql-copy-command.md](./psql-copy-command.md)

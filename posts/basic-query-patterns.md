@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Dynamic query building with parameterized filters. Efficient database-level filtering, not JavaScript filtering.
+Dynamic query building with parameterized filters. Efficient database-level filtering, not JavaScript filtering. Let PostgreSQL do what it does best: filter and sort data efficiently using indexes. This approach scales much better than fetching everything and filtering in your application code.
 
 ## The Problem
 
-Fetching everything and filtering in JavaScript can be slow for large datasets and may not leverage database indexes effectively.
+Fetching everything and filtering in JavaScript can be slow for large datasets and may not leverage database indexes effectively. When you fetch all records and filter in your application code, you're transferring unnecessary data over the network and doing work that PostgreSQL could do much more efficiently. Database indexes can't help if you're not using them in your queries.
 
 ```typescript
 const result = await query('SELECT * FROM users');
@@ -19,7 +19,7 @@ const filtered = result.rows.filter(user => user.active && user.role === 'admin'
 
 ## The Solution
 
-Build dynamic queries with parameterized filters.
+Build dynamic queries with parameterized filters. Construct your WHERE clause dynamically based on the filters provided, but always use parameterized queries to maintain security. This lets PostgreSQL use indexes effectively while keeping your queries safe from SQL injection.
 
 **Basic filtering:**
 ```typescript
@@ -97,9 +97,9 @@ export async function GET(request: Request) {
 
 ## Benefits
 
-- Performance - Database handles filtering efficiently
-- Flexibility - Support multiple filter combinations
-- Security - Parameterized queries prevent SQL injection
-- Scalability - Works well as data grows
+- **Performance** - Database handles filtering efficiently using indexes and optimized query plans. PostgreSQL is much faster at filtering than JavaScript, especially as data grows.
+- **Flexibility** - Support multiple filter combinations. Clients can combine different filters, and your API builds the appropriate query dynamically.
+- **Security** - Parameterized queries prevent SQL injection. Even though you're building queries dynamically, parameters are safely separated from SQL structure.
+- **Scalability** - Works well as data grows. Database-level filtering scales much better than fetching everything and filtering in memory.
 
 Next: [pagination-strategies.md](./pagination-strategies.md)

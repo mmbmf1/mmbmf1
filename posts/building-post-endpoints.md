@@ -6,11 +6,11 @@
 
 ## Introduction
 
-POST endpoints with parameterized queries. Safe inserts, handles conflicts, returns created records.
+POST endpoints with parameterized queries. Safe inserts, handles conflicts, returns created records. These patterns ensure data integrity while providing clear feedback to API consumers. Essential for any application that needs to create new records safely and reliably.
 
 ## The Problem
 
-String concatenation in queries can lead to SQL injection vulnerabilities. Missing conflict handling can result in unclear error messages.
+String concatenation in queries can lead to SQL injection vulnerabilities. Missing conflict handling can result in unclear error messages. When you build INSERT queries by concatenating user input, malicious users can inject SQL code. Even worse, when unique constraint violations occur, PostgreSQL returns cryptic error codes that don't help API consumers understand what went wrong.
 
 ```typescript
 const sql = `INSERT INTO users (email, name) VALUES ('${email}', '${name}')`;
@@ -18,7 +18,7 @@ const sql = `INSERT INTO users (email, name) VALUES ('${email}', '${name}')`;
 
 ## The Solution
 
-Use parameterized queries with proper error handling.
+Use parameterized queries with proper error handling. Parameterized queries prevent SQL injection completely, and proper error handling translates PostgreSQL error codes into clear, user-friendly messages. Catch constraint violations and return appropriate HTTP status codes that API consumers can handle gracefully.
 
 **Basic insert:**
 ```typescript
@@ -86,9 +86,9 @@ export async function POST(request: Request) {
 
 ## Benefits
 
-- Security - Prevents SQL injection
-- Reliability - Handles conflicts gracefully
-- User experience - Clear error messages
-- Maintainability - Consistent patterns
+- **Security** - Prevents SQL injection by design. Parameterized queries make it impossible for user input to be executed as SQL code, protecting your database from malicious attacks.
+- **Reliability** - Handles conflicts gracefully. When duplicate records are attempted, your API returns clear error messages instead of crashing or returning cryptic database errors.
+- **User experience** - Clear error messages that help API consumers understand what went wrong and how to fix it. Proper HTTP status codes make error handling straightforward.
+- **Maintainability** - Consistent patterns across all your POST endpoints. Once you establish the pattern, every endpoint follows the same reliable approach.
 
 Next: [building-update-endpoints.md](./building-update-endpoints.md)
