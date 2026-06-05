@@ -73,12 +73,3 @@
     <img src="./assets/tailwind-svgrepo-com.svg" alt="tailwind" width="40" height="40"/>
   </a>
 </p>
-<h3 align="left">connect with me:</h3>
-<p align="left">
-  <a href="https://linkedin.com/in/michael-mace-kc" target="blank">
-    <img align="center" src="./assets/linkedin.svg" alt="mmbmf1" height="30" width="30" />
-  </a>
-  <a href="https://www.alltrails.com/members/michael-mace-2" target="blank">
-    <img align="center" src="./assets/alltrails-svgrepo-com.svg" alt="mmbmf1" height="30" width="30" />
-  </a>
-</p>
