@@ -22,6 +22,7 @@
 
 I'm Michael Mace, a full-stack developer building enterprise systems. I work with PostgreSQL, Next.js, and Node.js to design systems that are reliable and straightforward. I'm interested in system architecture, technical leadership, and solving real problems through clean code and thoughtful integrations. Outside of work, I enjoy spending time with family, hiking, and traveling to new places.
 
+<!--
 <h3 align="left">tools I work with:</h3>
 <p align="left">
   <a href="https://www.postgresql.org" target="_blank" rel="noreferrer">
@@ -43,6 +44,7 @@ I'm Michael Mace, a full-stack developer building enterprise systems. I work wit
     <img src="./assets/tailwind-svgrepo-com.svg" alt="tailwind" width="40" height="40"/>
   </a>
 </p>
+-->
 
 ---
 
