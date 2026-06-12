@@ -20,39 +20,9 @@
 </div>
 -->
 
-## 🖖 whats up
+I'm Michael Mace, a full-stack developer building enterprise systems. I work with PostgreSQL, Next.js, and Node.js to design systems that are reliable and straightforward. I'm interested in system architecture, technical leadership, and solving real problems through clean code and thoughtful integrations. Outside of work, I enjoy hiking, backpacking, and Kansas City sports.
 
-- 🔭 Working as **Software Developer** at [Conexon](https://conexon.us/) building enterprise applications
-- 🏗️ **Building** production systems with PostgreSQL and Next.js
-- 🤝 **Mentoring** developers and helping lead technical teams through system integrations
-- 🚀 **Working on** core business systems and cross-application integrations
-- 💬 Ask me about **My Family, hiking/backpacking, pollo bandido, fast cars, keyboard shortcuts, FTTH, data, Kansas City sports**
-
-## 🏗
-
-**Full-Stack Developer** working with system architecture, PostgreSQL, APIs, and enterprise applications.
-
-**Interested in:**
-
-- **System Architecture**: Building scalable APIs and database systems
-- **Technical Leadership**: Mentoring developers and leading projects from requirements to deployment
-- **Cross-Application Integration**: Building unified data platforms and real-time synchronization
-- **Process Automation**: Streamlining business operations across multiple departments
-
-<!-- like this but want to update it
-**Recent Achievements:**
-- Architected successful cross-application integration for streamlined workflows
-- Part of a team that automated invoice creation for internal billing software
-- Automated business processes for Funding, Regulatory, and Billing teams
--->
-
-<!--
-## 👨‍💻
-- [Building a PostgreSQL FDW Data Pipeline](./posts/postgresql-fdw-pipeline.md) - How to create data synchronization systems using PostgreSQL Foreign Data Wrappers for real-time cross-database access
-- [Building a PostgreSQL + NextJS geojson pipeline](./posts/postgresql-nextjs-geojson-pipeline.md) - How to build geospatial data pipelines using PostgreSQL and NextJS for mapping applications
--->
-
-<h3 align="left">proud to work with these tools:</h3>
+<h3 align="left">tools I work with:</h3>
 <p align="left">
   <a href="https://www.postgresql.org" target="_blank" rel="noreferrer">
     <img src="./assets/postgresql-svgrepo-com.svg" alt="postgresql" width="40" height="40"/>
@@ -73,3 +43,7 @@
     <img src="./assets/tailwind-svgrepo-com.svg" alt="tailwind" width="40" height="40"/>
   </a>
 </p>
+
+---
+
+[michaelmace.dev](https://michaelmace.dev)
