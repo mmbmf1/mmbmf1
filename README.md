@@ -20,7 +20,7 @@
 </div>
 -->
 
-domestic engineer, lawn care enthusiast, shitty black coffee connoisseur, prefers keyboard shortcuts, speak fluent gifs: a full-stack developer building enterprise systems. I work with PostgreSQL, Next.js, and Node.js to design systems that are reliable and straightforward. I'm interested in system architecture, technical leadership, and solving real problems through clean code and thoughtful integrations. Outside of work, I enjoy spending time with family, hiking, and traveling to new places.
+domestic engineer, lawn care enthusiast, shitty black coffee connoisseur, prefers keyboard shortcuts, speak fluent gifs: a full-stack developer building enterprise systems. I work with PostgreSQL, and Next.js to build systems that are reliable and straightforward. I'm interested in system architecture, technical leadership, and solving real problems through clean code and thoughtful integrations. Outside of work, I enjoy spending time with family, hiking, and traveling to new places.
 
 <!--
 <h3 align="left">tools I work with:</h3>
