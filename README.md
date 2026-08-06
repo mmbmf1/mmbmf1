@@ -19,7 +19,11 @@
   />
 </div>
 -->
-domestic engineer, lawn care enthusiast, shitty black coffee connoisseur, prefers keyboard shortcuts, speak fluent gif. a full-stack developer building enterprise systems. I work with PostgreSQL, and Next.js to build systems that are reliable and straightforward. I'm interested in system architecture, technical leadership, and solving real problems through clean code and thoughtful integrations. Outside of work, I enjoy spending time with family, hiking, traveling to new places and tinkering with AI.
+Full-stack developer building internal tools for a rural fiber ISP.
+
+I work on APIs, automation, data workflows, analysis, and systems integration. Most days that means PostgreSQL, JavaScript/TypeScript, and Next.js. Lately I’ve also been spending time on semantic search with embeddings and pgvector, some agent/MCP tooling, and occasional geospatial work when the problem calls for it.
+
+Interested in system architecture, practical AI, technical leadership, and straightforward software.
 <!--
 <h3 align="left">tools I work with:</h3>
 <p align="left">
